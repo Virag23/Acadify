@@ -1,0 +1,420 @@
+import 'package:acadify/screens/home.dart';
+import 'package:acadify/screens/login.dart';
+import 'package:flutter/material.dart';
+import 'dart:convert'; // For JSON encoding
+import 'package:http/http.dart' as http; // HTTP requests
+import 'package:shared_preferences/shared_preferences.dart'; // For storing user data
+
+Future<void> saveLoginStatus(
+    bool status, String role, String collegeName) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', status); // Save login status
+  await prefs.setString('userRole', role); // Save user role
+  await prefs.setString('college_name', collegeName); // Save college name
+}
+
+class StudentRegistrationPage extends StatefulWidget {
+  final String collegeName;
+
+  StudentRegistrationPage({required this.collegeName});
+
+  @override
+  _StudentRegistrationPageState createState() =>
+      _StudentRegistrationPageState();
+}
+
+class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController prnController = TextEditingController();
+  final TextEditingController rollNoController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  String? selectedDepartment;
+  String? selectedYear;
+  String? selectedSemester;
+  String? selectedDivision;
+  String? collegeName; // Store selected college name
+
+  bool isLoading = false; // Track loading state
+
+  final List<String> departments = [
+    "CSE",
+    "IT",
+    "EnTC",
+    "ECE",
+    "Civil",
+    "Mechanical"
+  ];
+  final List<String> years = ["FY", "SY", "TY", "BE"];
+  final List<String> semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
+  final List<String> divisions = ["A", "B", "C"];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCollegeName(); // Load the college name when screen starts
+  }
+
+  // Function to get college_name from SharedPreferences
+  Future<void> _loadCollegeName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      collegeName = prefs.getString('college_name');
+    });
+
+    if (collegeName == null) {
+      showSnackbar(context, "Error: College name not found!", Colors.red);
+    }
+  }
+
+  Future<void> registerStudent(BuildContext context) async {
+    if (collegeName == null) {
+      showSnackbar(context, "Error: No college selected!", Colors.red);
+      return;
+    }
+
+    if (emailController.text.isEmpty ||
+        phoneController.text.isEmpty ||
+        nameController.text.isEmpty ||
+        prnController.text.isEmpty ||
+        selectedDepartment == null ||
+        selectedYear == null ||
+        selectedSemester == null ||
+        selectedDivision == null ||
+        rollNoController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      showSnackbar(context, "All fields are required!", Colors.red);
+      return;
+    }
+
+    // **Email Validation**
+    if (!RegExp(r"^[a-zA-Z0-9._%+-]+@gmail\.com$")
+        .hasMatch(emailController.text)) {
+      showSnackbar(context, "Please enter a valid email address!", Colors.red);
+      return;
+    }
+
+    // **Phone Number Validation**
+    if (phoneController.text.length != 10 ||
+        !RegExp(r'^[0-9]+$').hasMatch(phoneController.text)) {
+      showSnackbar(
+          context, "Please enter a valid 10-digit phone number!", Colors.red);
+      return;
+    }
+
+    // **PRN Validation**
+    if (prnController.text.length != 10 ||
+        !RegExp(r'^[0-9]+$').hasMatch(prnController.text)) {
+      showSnackbar(context, "PRN should only contain numbers!", Colors.red);
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.108.47:5000/api/register'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "college_name": collegeName, // Send college name dynamically
+          "name": nameController.text,
+          "email": emailController.text,
+          "number": phoneController.text,
+          "prn": prnController.text,
+          "department": selectedDepartment,
+          "year": selectedYear,
+          "semester": selectedSemester,
+          "division": selectedDivision,
+          "roll_no": rollNoController.text,
+          "password": passwordController.text
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final name = jsonDecode(response.body)['name'];
+        // Save login status and user details in SharedPreferences
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('is_logged_in', true); // Set login status to true
+        await prefs.setString('user_name', nameController.text);
+        await prefs.setString('user_email', emailController.text);
+        await prefs.setString('user_prn', prnController.text);
+
+        await saveLoginStatus(true, "student", collegeName!);
+
+        showSnackbar(context,
+            'Student registered successfully, Welcome, $name!', Colors.green);
+
+        // Navigate to the Home Page
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    HomePage(collegeName: collegeName ?? '')));
+      } else {
+        final error = jsonDecode(response.body)['error'] ?? "Unknown error";
+        showSnackbar(context, "Registration Failed: $error", Colors.red);
+      }
+    } catch (e) {
+      showSnackbar(context,
+          "Error: Unable to register. Please try again later.", Colors.red);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void showSnackbar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('ACADIFY',
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.only(top: 0.0),
+              child: Center(
+                child: Text("${collegeName ?? 'Loading...'}",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 0.0),
+              child: Center(
+                child: Text('Student Registration',
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              ),
+            ),
+            SizedBox(height: 15),
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'Full Name',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 50),
+                alignLabelWithHint: true,
+              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+            ),
+            SizedBox(height: 15),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 50),
+                alignLabelWithHint: true,
+              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+            ),
+            SizedBox(height: 15),
+            TextField(
+              controller: phoneController,
+              decoration: InputDecoration(
+                labelText: 'Phone Number',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 50),
+                alignLabelWithHint: true,
+              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+            ),
+            SizedBox(height: 15),
+            TextField(
+              controller: prnController,
+              decoration: InputDecoration(
+                labelText: 'PRN Number',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 50),
+                alignLabelWithHint: true,
+              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+            ),
+            DropdownButtonFormField<String>(
+              value: selectedDepartment,
+              decoration: InputDecoration(labelText: 'Select Department'),
+              items: departments.map((dept) {
+                return DropdownMenuItem<String>(
+                  value: dept,
+                  child: Text(dept),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedDepartment = value;
+                });
+              },
+            ),
+            DropdownButtonFormField<String>(
+              value: selectedYear,
+              decoration: InputDecoration(labelText: 'Select Current Year'),
+              items: years.map((year) {
+                return DropdownMenuItem<String>(
+                  value: year,
+                  child: Text(year),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedYear = value;
+                });
+              },
+            ),
+            DropdownButtonFormField<String>(
+              value: selectedSemester,
+              decoration: InputDecoration(labelText: 'Select Current Semester'),
+              items: semesters.map((sem) {
+                return DropdownMenuItem<String>(
+                  value: sem,
+                  child: Text(sem),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedSemester = value;
+                });
+              },
+            ),
+            DropdownButtonFormField<String>(
+              value: selectedDivision,
+              decoration: InputDecoration(labelText: 'Select Your Division'),
+              items: divisions.map((div) {
+                return DropdownMenuItem<String>(
+                  value: div,
+                  child: Text(div),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedDivision = value;
+                });
+              },
+            ),
+            SizedBox(height: 15),
+            TextField(
+              controller: rollNoController,
+              decoration: InputDecoration(
+                labelText: 'Roll No.',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 50),
+                alignLabelWithHint: true,
+              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+            ),
+            SizedBox(height: 15),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(color: Colors.black),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 50,
+                ),
+                alignLabelWithHint: true,
+              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+            ),
+            SizedBox(height: 20),
+            Center(
+              child: isLoading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: () => registerStudent(context),
+                      child: Text('Register',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400)),
+                      style: ElevatedButton.styleFrom(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                      ),
+                    ),
+            ),
+            SizedBox(height: 20),
+            Center(
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              LoginPage(collegeName: collegeName ?? '')));
+                },
+                child: Text("Already a registered student? Log in here.",
+                    style: TextStyle(fontSize: 16, color: Colors.blue)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField(TextEditingController controller, String label,
+      {bool isPassword = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(),
+        ),
+      ),
+    );
+  }
+
+  Widget buildDropdown(String label, List<String> items, String? selectedValue,
+      ValueChanged<String?> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: DropdownButtonFormField<String>(
+        value: selectedValue,
+        decoration:
+            InputDecoration(labelText: label, border: OutlineInputBorder()),
+        items: items.map((value) {
+          return DropdownMenuItem<String>(value: value, child: Text(value));
+        }).toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
+}

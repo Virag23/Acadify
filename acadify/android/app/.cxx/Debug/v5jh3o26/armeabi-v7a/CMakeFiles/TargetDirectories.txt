@@ -1,0 +1,2 @@
+F:/CollegeApp/acadify/android/app/.cxx/Debug/v5jh3o26/armeabi-v7a/CMakeFiles/edit_cache.dir
+F:/CollegeApp/acadify/android/app/.cxx/Debug/v5jh3o26/armeabi-v7a/CMakeFiles/rebuild_cache.dir
