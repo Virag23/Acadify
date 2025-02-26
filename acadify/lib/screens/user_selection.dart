@@ -7,8 +7,9 @@ import 'college_selection.dart'; // Import the CollegeSelectionPage
 
 class UserSelectionPage extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  UserSelectionPage({required this.collegeName});
+  UserSelectionPage({required this.collegeName, required this.college});
 
   @override
   _UserSelectionPageState createState() => _UserSelectionPageState();
@@ -16,6 +17,7 @@ class UserSelectionPage extends StatefulWidget {
 
 class _UserSelectionPageState extends State<UserSelectionPage> {
   String? collegeName;
+  String? college;
 
   @override
   void initState() {
@@ -27,24 +29,24 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_full_name');
+      college = prefs.getString('college_name');
     });
 
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       Future.delayed(Duration.zero, () {
         showSnackbar(context, "Error: College name not found!", Colors.red);
       });
     }
   }
 
-  // Logout Function
   Future<void> _logout() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('college_full_name'); // Remove selected college name
     await prefs.remove('college_name'); // Remove selected college
     await prefs.remove('isLoggedIn'); // Remove login status (if needed)
     await prefs.remove('userRole'); // Remove user role (if needed)
 
-    // Navigate back to College Selection Page
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => CollegeSelectionPage()),
@@ -84,13 +86,15 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
       body: Column(
         children: [
           SizedBox(height: 20),
-          // Display College Name
           Padding(
             padding: const EdgeInsets.only(top: 0.0),
-            child: Center(
+            child: Align(
+              alignment: Alignment.center,
               child: Text(
                 collegeName ?? 'Loading...',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                textAlign: TextAlign
+                    .center, // Ensures text alignment within the widget
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -114,7 +118,8 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => StudentRegistrationPage(
-                                  collegeName: collegeName ?? '')));
+                                  collegeName: collegeName ?? '',
+                                  college: college ?? '')));
                     },
                   ),
                   UserBox(
@@ -125,7 +130,9 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => FacultyRegistrationPage(
-                                  collegeName: collegeName ?? '')));
+                                    collegeName: collegeName ?? '',
+                                    college: '',
+                                  )));
                     },
                   ),
                   UserBox(
@@ -136,7 +143,9 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => AdminRegistrationPage(
-                                  collegeName: collegeName ?? '')));
+                                    collegeName: collegeName ?? '',
+                                    college: '',
+                                  )));
                     },
                   ),
                 ],

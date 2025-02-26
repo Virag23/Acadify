@@ -3,8 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FacultyHomePage extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  FacultyHomePage({required this.collegeName});
+  FacultyHomePage({required this.collegeName, required this.college});
 
   @override
   _FacultyHomePageState createState() => _FacultyHomePageState();
@@ -12,32 +13,25 @@ class FacultyHomePage extends StatefulWidget {
 
 class _FacultyHomePageState extends State<FacultyHomePage> {
   String? collegeName;
-  String? userName; //
+  String? college;
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadCollegeName();
-    _fetchUserName();
   }
 
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_name') ?? widget.collegeName;
+      college = prefs.getString('college') ?? widget.college;
     });
 
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       showSnackbar(context, "Error: College name not found!", Colors.red);
     }
-  }
-
-  Future<String?> _fetchUserName() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userName = prefs.getString('userName');
-    print("Fetched User Name: $userName"); // Debugging
-    return userName ?? 'Unknown User';
   }
 
   void showSnackbar(BuildContext context, String message, Color color) {
@@ -79,20 +73,19 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 20),
-                // College Name
                 Padding(
                   padding: const EdgeInsets.only(top: 0.0),
-                  child: Text(
-                    widget.collegeName,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      collegeName ?? 'Loading...',
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
                 SizedBox(height: 20),
-
-                // User Profile Section (Icon + Welcome Message + User Name)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -103,39 +96,20 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                         backgroundColor: Colors.blue.shade100,
                         child: Icon(Icons.person, size: 35, color: Colors.blue),
                       ),
-                      SizedBox(width: 15),
-
-                      // Welcome Message + User Name
+                      SizedBox(width: 15), SizedBox(width: 15),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome',
+                            'Welcome, {name ?? "Loading..."}!',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          FutureBuilder(
-                            future: _fetchUserName(),
-                            builder: (context, snapshot) {
-                              return Text(
-                                userName ?? 'Fetching...',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black87,
-                                ),
-                              );
-                            },
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-
                 SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.all(10.0),

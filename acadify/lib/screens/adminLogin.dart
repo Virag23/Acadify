@@ -7,17 +7,19 @@ import 'package:acadify/Screens/college_selection.dart';
 import 'package:acadify/screens/adminHome.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName) async {
+    bool status, String role, String collegeName, String college) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status);
   await prefs.setString('userRole', role);
   await prefs.setString('college_name', collegeName);
+  await prefs.setString('college', college);
 }
 
 class AdminLogin extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  AdminLogin({required this.collegeName});
+  AdminLogin({required this.collegeName, required this.college});
 
   @override
   _AdminLoginState createState() => _AdminLoginState();
@@ -28,6 +30,7 @@ class _AdminLoginState extends State<AdminLogin> {
   final TextEditingController passwordController = TextEditingController();
 
   String? collegeName;
+  String? college;
 
   bool isLoading = false;
 
@@ -40,10 +43,11 @@ class _AdminLoginState extends State<AdminLogin> {
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_full_name');
+      college = prefs.getString('college_name');
     });
 
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
@@ -54,13 +58,14 @@ class _AdminLoginState extends State<AdminLogin> {
   }
 
   Future<void> login(BuildContext context) async {
-    if (collegeName == null) {
-      showSnackbar("Error: No college selected!", Colors.red);
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      showSnackbar(context, 'Please fill in all fields!', Colors.red);
       return;
     }
 
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      showSnackbar("Please fill in all fields!", Colors.red);
+    if (!RegExp(r"^[a-zA-Z0-9._%+-]+@college\.org$")
+        .hasMatch(emailController.text)) {
+      showSnackbar(context, "Please enter a valid email address!", Colors.red);
       return;
     }
 
@@ -74,7 +79,7 @@ class _AdminLoginState extends State<AdminLogin> {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'college_name': collegeName,
+          'college': college,
           'email': emailController.text,
           'password': passwordController.text,
         }),
@@ -87,33 +92,36 @@ class _AdminLoginState extends State<AdminLogin> {
       if (response.statusCode == 200) {
         final name = jsonDecode(response.body)['name'];
 
-        await saveLoginStatus(true, "admin", collegeName!);
+        await saveLoginStatus(true, "admin", collegeName!, college!);
 
-        showSnackbar("Welcome, $name!", Colors.green);
+        showSnackbar(context, 'Welcome, $name!', Colors.green);
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  AdminHomePage(collegeName: collegeName ?? '')),
+              builder: (context) => AdminHomePage(
+                  collegeName: collegeName ?? '', college: college ?? '')),
         );
       } else {
-        showSnackbar("Invalid Credentials! Please try again.", Colors.red);
+        showSnackbar(
+            context, 'Invalid Credentials! Please try again.', Colors.red);
       }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      showSnackbar(
-          "Error: Unable to login. Please try again later.", Colors.red);
+      showSnackbar(context, "Error: Unable to login. Please try again later.",
+          Colors.red);
     }
   }
 
-  void showSnackbar(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: color,
-    ));
+  void showSnackbar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      ),
+    );
   }
 
   @override
@@ -135,10 +143,14 @@ class _AdminLoginState extends State<AdminLogin> {
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.only(top: 0.0),
-                child: Center(
-                  child: Text(widget.collegeName,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    collegeName ?? 'Loading...',
+                    textAlign: TextAlign
+                        .center, // Ensures text alignment within the widget
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
               Padding(
@@ -203,7 +215,8 @@ class _AdminLoginState extends State<AdminLogin> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => AdminRegistrationPage(
-                                collegeName: collegeName ?? '')));
+                                collegeName: collegeName ?? '',
+                                college: college ?? '')));
                   },
                   child: Text(
                     "New Admin? Register here",

@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-from flask_bcrypt import Bcrypt  # type: ignore
-from flask_cors import CORS  # type: ignore
+from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 import mysql.connector
 import re
 
@@ -9,7 +9,6 @@ CORS(app)
 
 bcrypt = Bcrypt(app)
 
-# Function to Connect to Database
 def get_db_connection():
     return mysql.connector.connect(
         host="localhost",        
@@ -18,10 +17,8 @@ def get_db_connection():
         database="collegeapp"    
     )
 
-def get_college_table_name(college_name, table_type):
-    sanitized_name = re.sub(r'[^a-zA-Z0-9]', '_', college_name.lower()).replace('__', '_').strip('_')
-    print(sanitized_name)
-    return f"{sanitized_name}_{table_type}"
+def get_college_table_name(college, table_type):
+    return f"{college}_{table_type}"
 
 @app.route("/")
 def home():
@@ -30,12 +27,13 @@ def home():
 @app.route('/api/register_college', methods=['POST'])
 def register_college():
     data = request.get_json()
+    college_full_name = data.get('college_full_name', '').strip()
     college_name = data.get('college_name', '').strip()
     password = data.get('password', '').strip()
     college_email = data.get('college_email', '').strip()
     college_number = data.get('college_number', '').strip()
 
-    if not all([ college_name, password, college_email, college_number]):
+    if not all([college_full_name, college_name, password, college_email, college_number]):
         return jsonify({"error": "All fields are required!"}), 400
 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -45,12 +43,12 @@ def register_college():
 
     try:
         cursor.execute("""
-            INSERT INTO college_name (college_name, password, college_email, college_number) 
+            INSERT INTO college_name (college_full_name, college_name, password, college_email, college_number) 
             VALUES (%s, %s, %s, %s,%s)
-        """, (college_name, hashed_password, college_email, college_number))
+        """, (college_full_name, college_name, hashed_password, college_email, college_number))
         
         conn.commit()
-        return jsonify({"message": f"College '{college_name}' Registered Successfully!"}), 201
+        return jsonify({"message": f"College '{college_full_name}' Registered Successfully!"}), 201
     except mysql.connector.IntegrityError:
         return jsonify({"error": "College already exists!"}), 400
     finally:
@@ -61,15 +59,26 @@ def register_college():
 def get_colleges():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT college_name FROM college_name")  
+    cursor.execute("SELECT college_full_name FROM college_name")  
     colleges = cursor.fetchall()
     cursor.close()
     conn.close()
     return jsonify(colleges), 200
 
+@app.route('/api/names', methods=['GET'])
+def get_names():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT college_name FROM college_name")  
+    names = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(names), 200
+
 @app.route('/api/verify_college', methods=['POST']) 
 def verify_college():
     data = request.get_json()
+    college_full_name = data.get('college_full_name', '').strip()
     college_name = data.get('college_name', '').strip()
     password = data.get('password', '').strip()
 
@@ -77,11 +86,11 @@ def verify_college():
     cursor = conn.cursor(dictionary=True)
 
     try:
-        cursor.execute("SELECT password FROM college_name WHERE college_name = %s", (college_name,))
+        cursor.execute("SELECT password FROM college_name WHERE college_full_name = %s AND college_name = %s", (college_full_name, college_name))
         result = cursor.fetchone()
 
         if result and bcrypt.check_password_hash(result['password'], password):
-            return jsonify({"message": "College Verified!"}), 200
+            return jsonify({"message": f"'{college_full_name}' Verified!"}), 200
         else:
             return jsonify({"error": "Invalid Password"}), 400
     finally:
@@ -92,13 +101,13 @@ def verify_college():
 @app.route('/api/register', methods=['POST'])
 def register_student():
     data = request.get_json()
-    college_name = data.get('college_name', '').strip()
-    print(f"Received college_name: '{college_name}'")
+    college = data.get('college', '').strip()
+    print(f"Received college_name: '{college}'")
 
-    if not college_name:
+    if not college:
         return jsonify({"error": "College name is required!"}), 400
 
-    table_name = get_college_table_name(college_name, "students")
+    table_name = get_college_table_name(college, "students")
     print(f"Trying to access table: {table_name}")
 
     name = data.get('name')
@@ -137,11 +146,13 @@ def register_student():
 @app.route('/api/login', methods=['POST'])
 def api_login():
     data = request.get_json()
-    college_name = data.get('college_name', '').strip()
-    if not college_name:
+    college = data.get('college', '').strip()
+    print(f"Received college_name: '{college}'")
+
+    if not college:
         return jsonify({"error": "College name is required!"}), 400
 
-    table_name = get_college_table_name(college_name, "students")
+    table_name = get_college_table_name(college, "students")
     print(f"Trying to access table: {table_name}")
     
     email = data.get('email')
@@ -164,11 +175,11 @@ def api_login():
 @app.route('/api/facultyregister', methods=['POST'])
 def register_faculty():
     data = request.get_json()
-    college_name = data.get('college_name', '').strip()
-    if not college_name:
+    college = data.get('college', '').strip()
+    if not college:
         return jsonify({"error": "College name is required!"}), 400
 
-    table_name = get_college_table_name(college_name, "faculty")
+    table_name = get_college_table_name(college, "faculty")
     print(f"Trying to access table: {table_name}")
 
     name = data.get('name')
@@ -202,11 +213,11 @@ def register_faculty():
 @app.route('/api/facultylogin', methods=['POST'])
 def api_facultylogin():
     data = request.get_json()
-    college_name = data.get('college_name', '').strip()
-    if not college_name:
+    college = data.get('college', '').strip()
+    if not college:
         return jsonify({"error": "College name is required!"}), 400
 
-    table_name = get_college_table_name(college_name, "faculty")
+    table_name = get_college_table_name(college, "faculty")
     print(f"Trying to access table: {table_name}")
     
     email = data.get('email')
@@ -229,12 +240,12 @@ def api_facultylogin():
 @app.route('/api/adminRegister', methods=['POST'])
 def register_admin():
     data = request.get_json()
-    college_name = data.get('college_name', '').strip()
+    college= data.get('college', '').strip()
     
-    if not college_name:
+    if not college:
         return jsonify({"error": "College name is required!"}), 400
 
-    table_name = get_college_table_name(college_name, "admin")
+    table_name = get_college_table_name(college, "admin")
 
     name = data.get('name')
     email = data.get('email')
@@ -272,12 +283,12 @@ def api_adminLogin():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
-    college_name = data.get('college_name', '').strip()
+    college = data.get('college', '').strip()
     
-    if not college_name:
+    if not college:
         return jsonify({"error": "College name is required!"}), 400
 
-    table_name = get_college_table_name(college_name, "admin")
+    table_name = get_college_table_name(college, "admin")
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)

@@ -6,17 +6,19 @@ import 'package:http/http.dart' as http; // HTTP requests
 import 'package:shared_preferences/shared_preferences.dart'; // For storing user data
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName) async {
+    bool status, String role, String collegeName, String college) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
   await prefs.setString('userRole', role); // Save user role
   await prefs.setString('college_name', collegeName); // Save college name
+  await prefs.setString('college', college); // Save college
 }
 
 class StudentRegistrationPage extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  StudentRegistrationPage({required this.collegeName});
+  StudentRegistrationPage({required this.collegeName, required this.college});
 
   @override
   _StudentRegistrationPageState createState() =>
@@ -36,6 +38,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
   String? selectedSemester;
   String? selectedDivision;
   String? collegeName; // Store selected college name
+  String? college; // Store selected college
 
   bool isLoading = false; // Track loading state
 
@@ -61,16 +64,19 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_full_name');
+      college = prefs.getString('college_name');
     });
 
-    if (collegeName == null) {
-      showSnackbar(context, "Error: College name not found!", Colors.red);
+    if (collegeName == null || college == null) {
+      Future.delayed(Duration.zero, () {
+        showSnackbar(context, "Error: College name not found!", Colors.red);
+      });
     }
   }
 
   Future<void> registerStudent(BuildContext context) async {
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       showSnackbar(context, "Error: No college selected!", Colors.red);
       return;
     }
@@ -89,7 +95,6 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
       return;
     }
 
-    // **Email Validation**
     if (!RegExp(r"^[a-zA-Z0-9._%+-]+@gmail\.com$")
         .hasMatch(emailController.text)) {
       showSnackbar(context, "Please enter a valid email address!", Colors.red);
@@ -120,7 +125,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
         Uri.parse('http://192.168.108.47:5000/api/register'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "college_name": collegeName, // Send college name dynamically
+          "college": college, // Send college name dynamically
           "name": nameController.text,
           "email": emailController.text,
           "number": phoneController.text,
@@ -139,21 +144,22 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
         // Save login status and user details in SharedPreferences
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('is_logged_in', true); // Set login status to true
-        await prefs.setString('user_name', nameController.text);
-        await prefs.setString('user_email', emailController.text);
-        await prefs.setString('user_prn', prnController.text);
+        await prefs.setString('name', nameController.text);
+        await prefs.setString('email', emailController.text);
+        await prefs.setString('prn', prnController.text);
 
-        await saveLoginStatus(true, "student", collegeName!);
+        await saveLoginStatus(true, "student", collegeName!, college!);
 
-        showSnackbar(context,
-            'Student registered successfully, Welcome, $name!', Colors.green);
+        showSnackbar(
+            context, 'Registered successfully, Welcome, $name!', Colors.green);
 
-        // Navigate to the Home Page
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    HomePage(collegeName: collegeName ?? '')));
+                builder: (context) => HomePage(
+                      collegeName: collegeName ?? '',
+                      college: '',
+                    )));
       } else {
         final error = jsonDecode(response.body)['error'] ?? "Unknown error";
         showSnackbar(context, "Registration Failed: $error", Colors.red);
@@ -191,10 +197,14 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(top: 0.0),
-              child: Center(
-                child: Text("${collegeName ?? 'Loading...'}",
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  collegeName ?? 'Loading...',
+                  textAlign: TextAlign
+                      .center, // Ensures text alignment within the widget
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
             Padding(
@@ -374,8 +384,10 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              LoginPage(collegeName: collegeName ?? '')));
+                          builder: (context) => LoginPage(
+                                collegeName: collegeName ?? '',
+                                college: '',
+                              )));
                 },
                 child: Text("Already a registered student? Log in here.",
                     style: TextStyle(fontSize: 16, color: Colors.blue)),

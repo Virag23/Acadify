@@ -11,7 +11,9 @@ class CollegeSelectionPage extends StatefulWidget {
 
 class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
   String? selectedCollege;
+  String? selectedName;
   List<String> colleges = [];
+  List<String> names = [];
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
@@ -23,49 +25,65 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
 
   Future<void> checkLoginStatus() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? savedCollege = prefs.getString('collegel_name');
+    final String? savedCollege = prefs.getString('college_full_name');
+    final String? savedName = prefs.getString('college_name');
     final bool isLoggedIn = prefs.getBool('is_logged_in') ?? false;
 
-    if (savedCollege != null && isLoggedIn) {
-      // If a college is already selected and user is logged in, skip to the next screen.
+    if (savedCollege != null && savedName != null && isLoggedIn) {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => UserSelectionPage(
-                  collegeName: selectedCollege ??
-                      ''))); // Provide a default value if null
+                    collegeName: savedCollege,
+                    college: savedName,
+                  )));
     } else {
-      // Fetch colleges if login status is not valid.
       fetchColleges();
     }
   }
 
-  Future<void> saveCollegeName(String collegeName) async {
+  Future<void> saveCollegeName(String collegeName, String college) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('college_name', collegeName); // Save the college name
+    await prefs.setString('college_full_name', collegeName);
+    await prefs.setString('college_name', college);
   }
 
   Future<void> saveLoginStatus(bool status) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_logged_in', status); // Save login status
+    await prefs.setBool('is_logged_in', status);
   }
 
   Future<void> fetchColleges() async {
-    final response =
-        await http.get(Uri.parse('http://192.168.108.47:5000/api/colleges'));
+    try {
+      final collegeResponse =
+          await http.get(Uri.parse('http://192.168.108.47:5000/api/colleges'));
+      final nameResponse =
+          await http.get(Uri.parse('http://192.168.108.47:5000/api/names'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> collegeList = jsonDecode(response.body);
-      setState(() {
-        colleges = collegeList
-            .map((college) => college['college_name'].toString())
-            .toList();
-      });
+      if (collegeResponse.statusCode == 200 && nameResponse.statusCode == 200) {
+        final List<dynamic> collegeList = jsonDecode(collegeResponse.body);
+        final List<dynamic> nameList = jsonDecode(nameResponse.body);
+
+        setState(() {
+          colleges = collegeList
+              .map((college) => college['college_full_name'].toString())
+              .toList();
+          names =
+              nameList.map((name) => name['college_name'].toString()).toList();
+        });
+      } else {
+        print(
+            "Error fetching data: ${collegeResponse.statusCode}, ${nameResponse.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
     }
   }
 
   Future<void> verifyCollege() async {
-    if (selectedCollege == null || passwordController.text.isEmpty) {
+    if (selectedCollege == null ||
+        selectedName == null ||
+        passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Select a college & enter password")));
       return;
@@ -76,7 +94,8 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
       Uri.parse('http://192.168.108.47:5000/api/verify_college'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-        "college_name": selectedCollege,
+        "college_full_name": selectedCollege,
+        "college_name": selectedName,
         "password": passwordController.text
       }),
     );
@@ -84,13 +103,15 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
     setState(() => isLoading = false);
 
     if (response.statusCode == 200) {
-      await saveCollegeName(selectedCollege!);
+      await saveCollegeName(selectedCollege!, selectedName!);
       await saveLoginStatus(true);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  UserSelectionPage(collegeName: selectedCollege ?? '')));
+              builder: (context) => UserSelectionPage(
+                    collegeName: selectedCollege!,
+                    college: selectedName!,
+                  )));
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Invalid Password!")));
@@ -101,12 +122,9 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'ACADIFY',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
@@ -115,27 +133,41 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 30.0),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 20.0),
               child: Text(
                 'Select Institute',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
             DropdownButton<String>(
-              hint: const Text("Select College",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400)),
+              hint: const Text("Select College Name"),
               value: selectedCollege,
               isExpanded: true,
               items: colleges.map((college) {
                 return DropdownMenuItem(value: college, child: Text(college));
               }).toList(),
-              onChanged: (value) => setState(() => selectedCollege = value),
+              onChanged: (value) {
+                setState(() {
+                  selectedCollege = value; // Sync college name
+                });
+              },
             ),
             const SizedBox(height: 15),
+            DropdownButton<String>(
+              hint: const Text("Select College"),
+              value: selectedName,
+              isExpanded: true,
+              items: names.map((name) {
+                return DropdownMenuItem(value: name, child: Text(name));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedName = value;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
             TextField(
               controller: passwordController,
               obscureText: true,
@@ -143,26 +175,23 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
                 labelText: 'Enter College Password',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
             Center(
               child: isLoading
-                  ? CircularProgressIndicator()
+                  ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: verifyCollege,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 15),
+                      ),
                       child: const Text("Verify",
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
-                      style: ElevatedButton.styleFrom(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                      ),
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
             ),
           ],

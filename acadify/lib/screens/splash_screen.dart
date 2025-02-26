@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
-
 import 'package:acadify/screens/college_selection.dart';
 import 'home.dart';
 import 'faculty_home.dart';
@@ -57,16 +56,19 @@ class _SplashScreenState extends State<SplashScreen> {
         case "student":
           nextPage = HomePage(
             collegeName: '',
+            college: '',
           );
           break;
         case "faculty":
           nextPage = FacultyHomePage(
             collegeName: '',
+            college: '',
           );
           break;
         case "admin":
           nextPage = AdminHomePage(
             collegeName: '',
+            college: '',
           );
           break;
       }

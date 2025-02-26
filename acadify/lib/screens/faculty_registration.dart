@@ -6,17 +6,19 @@ import 'package:http/http.dart' as http; // HTTP requests
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName) async {
+    bool status, String role, String collegeName, String college) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
   await prefs.setString('userRole', role); // Save user role
   await prefs.setString('college_name', collegeName); // Save college name
+  await prefs.setString('college', college); // Save college
 }
 
 class FacultyRegistrationPage extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  FacultyRegistrationPage({required this.collegeName});
+  FacultyRegistrationPage({required this.collegeName, required this.college});
 
   @override
   _FacultyRegistrationPageState createState() =>
@@ -29,8 +31,9 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
   final TextEditingController numberController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  String? Department;
+  String? selectedDepartment;
   String? collegeName;
+  String? college;
 
   bool isLoading = false; // To track the loading state
 
@@ -53,7 +56,8 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_full_name');
+      college = prefs.getString('college_name');
     });
 
     if (collegeName == null) {
@@ -69,7 +73,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
 
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
-        Department == null ||
+        selectedDepartment == null ||
         numberController.text.isEmpty ||
         passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -110,11 +114,11 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "college_name": collegeName,
+          "college": college,
           'name': nameController.text,
           'email': emailController.text,
           'number': numberController.text,
-          'department': Department,
+          'department': selectedDepartment,
           'password': passwordController.text,
         }),
       );
@@ -130,36 +134,42 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
         await prefs.setBool('is_logged_in', true); // Set login status to true
         await prefs.setString('user_name', nameController.text);
         await prefs.setString('user_email', emailController.text);
+        await prefs.setString('user_number', numberController.text);
+        await prefs.setString('user_department', selectedDepartment!);
 
-        await saveLoginStatus(true, "faculty", collegeName!);
+        await saveLoginStatus(true, "faculty", collegeName!, college!);
 
         showSnackbar(context,
             'Faculty registered successfully, Welcome, $name!', Colors.green);
 
-        // ✅ Navigate after a delay to ensure UI updates
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  FacultyHomePage(collegeName: collegeName ?? '')),
+                  FacultyHomePage(collegeName: collegeName ?? '', college: '')),
         );
       } else {
         final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
-        print("Registration failed: $error"); // Debug Log 6
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Registration Failed: $error'),
           backgroundColor: Colors.red,
         ));
       }
     } catch (e) {
+      showSnackbar(context,
+          "Error: Unable to register. Please try again later.", Colors.red);
+    } finally {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: Unable to register. Please try again later.'),
-        backgroundColor: Colors.red,
-      ));
     }
+  }
+
+  void showSnackbar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    ));
   }
 
   @override
@@ -183,10 +193,14 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(top: 0.0),
-              child: Center(
-                child: Text("${collegeName ?? 'Loading...'}",
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  collegeName ?? 'Loading...',
+                  textAlign: TextAlign
+                      .center, // Ensures text alignment within the widget
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
             Padding(
@@ -240,7 +254,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
             ),
             DropdownButtonFormField<String>(
-              value: Department,
+              value: selectedDepartment,
               decoration: InputDecoration(labelText: 'Select Department'),
               items: departments.map((dept) {
                 return DropdownMenuItem<String>(
@@ -250,7 +264,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  Department = value;
+                  selectedDepartment = value;
                 });
               },
             ),
@@ -291,8 +305,8 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              FacultyLogin(collegeName: collegeName ?? '')));
+                          builder: (context) => FacultyLogin(
+                              collegeName: collegeName ?? '', college: '')));
                 },
                 child: Text(
                   "Already a registered faculty? Log in here.",
@@ -320,6 +334,4 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
       ),
     );
   }
-
-  void showSnackbar(BuildContext context, String s, MaterialColor red) {}
 }

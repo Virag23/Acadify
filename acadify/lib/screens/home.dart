@@ -1,47 +1,32 @@
-import 'package:acadify/screens/adminRegistration.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  HomePage({required this.collegeName});
+  HomePage({required this.collegeName, required this.college});
 
   @override
   _StudentHomePageState createState() => _StudentHomePageState();
 }
 
 class _StudentHomePageState extends State<HomePage> {
-  late Future<String?> userNameFuture;
-
   String? collegeName;
-
-  bool isLoading = false;
+  String? college;
 
   @override
   void initState() {
     super.initState();
     _loadCollegeName();
-    userNameFuture = _fetchUserName();
   }
 
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_name') ?? widget.collegeName;
+      college = prefs.getString('college') ?? widget.college;
     });
-
-    if (collegeName == null) {
-      showSnackbar(context, "Error: College name not found!", Colors.red);
-    }
-  }
-
-  // Fetch User Name (Simulating Database Fetch)
-  Future<String?> _fetchUserName() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userName = prefs.getString('userName');
-    print("Fetched User Name: $userName"); // Debugging
-    return userName ?? 'Unknown User';
   }
 
   // Prevent Back Navigation
@@ -77,17 +62,17 @@ class _StudentHomePageState extends State<HomePage> {
                 SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.only(top: 0.0),
-                  child: Text(
-                    widget.collegeName,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      collegeName ?? 'Loading...',
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
                 SizedBox(height: 20),
-
-                // User Profile Section (Icon + Welcome Message + User Name)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -99,47 +84,20 @@ class _StudentHomePageState extends State<HomePage> {
                         child: Icon(Icons.person, size: 35, color: Colors.blue),
                       ),
                       SizedBox(width: 15),
-
-                      // Welcome Message + User Name
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome',
+                            'Welcome, {name ?? "Loading..."}!',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          FutureBuilder<String?>(
-                            future: userNameFuture,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Text('Fetching...',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500));
-                              }
-                              return Text(
-                                snapshot.data ?? 'Unknown User',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black87),
-                              );
-                            },
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-
                 SizedBox(height: 20),
-
-                // Features Grid
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: GridView.count(
@@ -178,7 +136,6 @@ class _StudentHomePageState extends State<HomePage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          // Add navigation functionality for each feature
           print('$title clicked');
         },
         child: Column(

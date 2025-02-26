@@ -6,17 +6,19 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName) async {
+    bool status, String role, String collegeName, String college) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status);
   await prefs.setString('userRole', role);
   await prefs.setString('college_name', collegeName);
+  await prefs.setString('college', college);
 }
 
 class LoginPage extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  LoginPage({required this.collegeName});
+  LoginPage({required this.collegeName, required this.college});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -27,6 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   String? collegeName;
+  String? college;
 
   bool isLoading = false;
 
@@ -39,10 +42,11 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_full_name');
+      college = prefs.getString('college_name');
     });
 
-    if (collegeName == null) {
+    if (college == null || collegeName == null) {
       showSnackbar(context, "Error: College name not found!", Colors.red);
     }
   }
@@ -69,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'college_name': collegeName,
+          'college': college,
           'email': emailController.text,
           'password': passwordController.text,
         }),
@@ -82,15 +86,15 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final name = jsonDecode(response.body)['name'];
 
-        await saveLoginStatus(true, "student", collegeName!);
+        await saveLoginStatus(true, "student", collegeName!, college!);
 
         showSnackbar(context, 'Welcome, $name!', Colors.green);
 
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    HomePage(collegeName: collegeName ?? '')));
+                builder: (context) => HomePage(
+                    collegeName: collegeName ?? '', college: college ?? '')));
       } else {
         showSnackbar(
             context, 'Invalid Credentials! Please try again.', Colors.red);
@@ -132,10 +136,14 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.only(top: 0.0),
-                child: Center(
-                  child: Text(widget.collegeName,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    collegeName ?? 'Loading...',
+                    textAlign: TextAlign
+                        .center, // Ensures text alignment within the widget
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
               Padding(
@@ -185,7 +193,9 @@ class _LoginPageState extends State<LoginPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => StudentRegistrationPage(
-                                collegeName: collegeName ?? '')));
+                                  collegeName: collegeName ?? '',
+                                  college: college ?? '',
+                                )));
                   },
                   child: Text("New student? Register here",
                       style: TextStyle(fontSize: 16, color: Colors.blue)),

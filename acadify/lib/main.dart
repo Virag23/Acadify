@@ -79,30 +79,39 @@ class _MyAppState extends State<MyApp> {
         '/collegeSelection': (context) => CollegeSelectionPage(),
         '/studentRegistration': (context) => StudentRegistrationPage(
               collegeName: '',
+              college: '',
             ),
         '/facultyRegistration': (context) => FacultyRegistrationPage(
               collegeName: '',
+              college: '',
             ),
         '/adminRegistration': (context) => AdminRegistrationPage(
               collegeName: '',
+              college: '',
             ),
         '/login': (context) => LoginPage(
               collegeName: '',
+              college: '',
             ),
         '/facultyLogin': (context) => FacultyLogin(
               collegeName: '',
+              college: '',
             ),
         '/adminLogin': (context) => AdminLogin(
               collegeName: '',
+              college: '',
             ),
         '/studentHome': (context) => HomePage(
               collegeName: '',
+              college: '',
             ),
         '/facultyHome': (context) => FacultyHomePage(
               collegeName: '',
+              college: '',
             ),
         '/adminHome': (context) => AdminHomePage(
               collegeName: '',
+              college: '',
             ),
         '/adminTimeTable': (context) => AdminTimetableScreen(
               collegeName: '',
@@ -122,14 +131,17 @@ class _MyAppState extends State<MyApp> {
       case '/studentHome':
         return HomePage(
           collegeName: '',
+          college: '',
         );
       case '/facultyHome':
         return FacultyHomePage(
           collegeName: '',
+          college: '',
         );
       case '/adminHome':
         return AdminHomePage(
           collegeName: '',
+          college: '',
         );
       case '/collegeSelection':
         return CollegeSelectionPage();

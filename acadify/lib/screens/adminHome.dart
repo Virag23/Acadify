@@ -5,7 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminHomePage extends StatefulWidget {
   final String collegeName;
-  AdminHomePage({required this.collegeName});
+  final String college;
+
+  AdminHomePage({required this.collegeName, required this.college});
 
   @override
   _AdminHomePage createState() => _AdminHomePage();
@@ -13,32 +15,25 @@ class AdminHomePage extends StatefulWidget {
 
 class _AdminHomePage extends State<AdminHomePage> {
   String? collegeName;
-  String? userName; //
+  String? college; //
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadCollegeName();
-    _fetchUserName();
   }
 
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_name') ?? widget.collegeName;
+      college = prefs.getString('college') ?? widget.college;
     });
 
     if (collegeName == null) {
       showSnackbar(context, "Error: College name not found!", Colors.red);
     }
-  }
-
-  Future<String?> _fetchUserName() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userName = prefs.getString('userName');
-    print("Fetched User Name: $userName"); // Debugging
-    return userName ?? 'Unknown User';
   }
 
   void showSnackbar(BuildContext context, String message, Color color) {
@@ -50,7 +45,6 @@ class _AdminHomePage extends State<AdminHomePage> {
   }
 
   Future<bool> _onWillPop() async {
-    // Return false to stop going back, true to allow it
     return false; // Disable back button
   }
 
@@ -82,11 +76,13 @@ class _AdminHomePage extends State<AdminHomePage> {
                 SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.only(top: 0.0),
-                  child: Text(
-                    widget.collegeName,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      collegeName ?? 'Loading...',
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -105,17 +101,9 @@ class _AdminHomePage extends State<AdminHomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome!',
+                            'Welcome, {name ?? "Loading..."}!',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            userName ?? 'Fetching...',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
+                                fontSize: 18, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),

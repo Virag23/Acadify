@@ -29,12 +29,15 @@ class MyApp extends StatelessWidget {
             CollegeSelectionPage(), // College selection
         '/studentHome': (context) => HomePage(
               collegeName: '',
+              college: '',
             ), // Student home page
         '/facultyHome': (context) => FacultyHomePage(
               collegeName: '',
+              college: '',
             ), // Faculty home page
         '/adminHome': (context) => AdminHomePage(
               collegeName: '',
+              college: '',
             ), // Admin home page
       },
       onUnknownRoute: (settings) => MaterialPageRoute(

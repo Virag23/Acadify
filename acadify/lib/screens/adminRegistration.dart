@@ -6,17 +6,19 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName) async {
+    bool status, String role, String collegeName, String college) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
   await prefs.setString('userRole', role); // Save user role
   await prefs.setString('college_name', collegeName); // Save college name
+  await prefs.setString('college', college); // Save college
 }
 
 class AdminRegistrationPage extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  AdminRegistrationPage({required this.collegeName});
+  AdminRegistrationPage({required this.collegeName, required this.college});
 
   @override
   _AdminRegistrationPageState createState() => _AdminRegistrationPageState();
@@ -33,6 +35,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
   String? selectedSemester;
   String? selectedDivision;
   String? collegeName;
+  String? college;
 
   bool isLoading = false;
 
@@ -57,16 +60,17 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_full_name');
+      college = prefs.getString('college_name');
     });
 
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       showSnackbar(context, "Error: College name not found!", Colors.red);
     }
   }
 
   Future<void> registerAdmin(BuildContext context) async {
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       showSnackbar(context, "Error: No college selected!", Colors.red);
       return;
     }
@@ -114,7 +118,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "college_name": collegeName,
+          "college": college,
           'name': nameController.text,
           'email': emailController.text,
           'number': numberController.text,
@@ -138,7 +142,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
         await prefs.setString('user_name', nameController.text);
         await prefs.setString('user_email', emailController.text);
 
-        await saveLoginStatus(true, "admin", collegeName!);
+        await saveLoginStatus(true, "admin", collegeName!, college!);
 
         showSnackbar(context, 'Admin registered successfully, Welcome, $name!',
             Colors.green);
@@ -146,8 +150,8 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  AdminHomePage(collegeName: collegeName ?? '')),
+              builder: (context) => AdminHomePage(
+                  collegeName: collegeName ?? '', college: college ?? '')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -188,10 +192,14 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(top: 0.0),
-              child: Center(
-                child: Text(widget.collegeName,
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  collegeName ?? 'Loading...',
+                  textAlign: TextAlign
+                      .center, // Ensures text alignment within the widget
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
               ),
             ),
             Padding(
@@ -342,8 +350,9 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
-                              AdminLogin(collegeName: collegeName ?? '')));
+                          builder: (context) => AdminLogin(
+                              collegeName: collegeName ?? '',
+                              college: college ?? '')));
                 },
                 child: Text(
                   "Already have an account? Login here",

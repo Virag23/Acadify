@@ -7,17 +7,19 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName) async {
+    bool status, String role, String collegeName, String college) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
   await prefs.setString('userRole', role);
   await prefs.setString('college_name', collegeName);
+  await prefs.setString('college', college);
 }
 
 class FacultyLogin extends StatefulWidget {
   final String collegeName;
+  final String college;
 
-  FacultyLogin({required this.collegeName});
+  FacultyLogin({required this.collegeName, required this.college});
 
   @override
   _FacultyLoginState createState() => _FacultyLoginState();
@@ -28,6 +30,8 @@ class _FacultyLoginState extends State<FacultyLogin> {
   final TextEditingController passwordController = TextEditingController();
 
   String? collegeName;
+  String? college;
+
   bool isLoading = false;
 
   @override
@@ -39,10 +43,11 @@ class _FacultyLoginState extends State<FacultyLogin> {
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name');
+      collegeName = prefs.getString('college_full_name');
+      college = prefs.getString('college_name');
     });
 
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
@@ -76,7 +81,7 @@ class _FacultyLoginState extends State<FacultyLogin> {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'college_name': collegeName,
+          'college': college,
           'email': emailController.text,
           'password': passwordController.text,
         }),
@@ -90,15 +95,15 @@ class _FacultyLoginState extends State<FacultyLogin> {
         final name = jsonDecode(response.body)['name'];
 
         // Save login status
-        await saveLoginStatus(true, "faculty", collegeName ?? '');
+        await saveLoginStatus(true, "faculty", collegeName!, college!);
 
         showSnackbar(context, 'Welcome, $name!', Colors.green);
 
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    FacultyHomePage(collegeName: collegeName!)));
+                builder: (context) => FacultyHomePage(
+                    collegeName: collegeName ?? '', college: college ?? '')));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Login failed. Please check your credentials.'),
@@ -138,10 +143,14 @@ class _FacultyLoginState extends State<FacultyLogin> {
               SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.only(top: 0.0),
-                child: Center(
-                  child: Text("${collegeName ?? 'Loading...'}",
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    collegeName ?? 'Loading...',
+                    textAlign: TextAlign
+                        .center, // Ensures text alignment within the widget
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
               Padding(
@@ -204,7 +213,9 @@ class _FacultyLoginState extends State<FacultyLogin> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => FacultyRegistrationPage(
-                                collegeName: collegeName ?? '')));
+                                  collegeName: collegeName ?? '',
+                                  college: college ?? '',
+                                )));
                   },
                   child: Text(
                     "New faculty? Register here",
