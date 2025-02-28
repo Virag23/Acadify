@@ -152,6 +152,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
       });
 
       if (response.statusCode == 201) {
+        // ignore: unused_local_variable
         final name = jsonDecode(response.body)['name'];
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -172,7 +173,9 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
             selectedDivision!,
             selectedSemester!);
 
-        showSnackbar(context, 'Admin registered successfully, Welcome, $name!',
+        showSnackbar(
+            context,
+            'Admin registered successfully, Welcome, $nameController',
             Colors.green);
 
         Navigator.pushReplacement(
@@ -230,7 +233,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   collegeName ?? 'Loading...',
                   textAlign: TextAlign
                       .center, // Ensures text alignment within the widget
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -239,7 +242,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
               child: Center(
                 child: Text('Admin Registration',
                     style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
               ),
             ),
             SizedBox(height: 15),

@@ -1,3 +1,4 @@
+import 'package:acadify/screens/Student_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -84,8 +85,6 @@ class _StudentHomePageState extends State<HomePage> {
       division = prefs.getString('division') ?? 'N/A';
       rollNo = prefs.getString('roll_no') ?? 'N/A';
     });
-    print(
-        "Loaded Student Details - Name: $name, Email: $email, Number: $number, PRN: $prn, Department: $department, Year: $year, Semester: $semester, Division: $division, Roll No: $rollNo");
   }
 
   // Prevent Back Navigation
@@ -127,7 +126,7 @@ class _StudentHomePageState extends State<HomePage> {
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -195,7 +194,18 @@ class _StudentHomePageState extends State<HomePage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          print('$title clicked');
+          if (title == "Profile") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => StudentProfilePage(
+                        collegeName: collegeName ?? '',
+                        college: '',
+                      )),
+            );
+          } else {
+            print("$title clicked");
+          }
         },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

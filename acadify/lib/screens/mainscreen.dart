@@ -1,3 +1,6 @@
+import 'package:acadify/screens/Admin_profile_page.dart';
+import 'package:acadify/screens/Faculty_profile_page.dart';
+import 'package:acadify/screens/Student_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:acadify/screens/home.dart';
@@ -39,6 +42,18 @@ class MyApp extends StatelessWidget {
               collegeName: '',
               college: '',
             ), // Admin home page
+        '/StudentProfilePage': (context) => StudentProfilePage(
+              collegeName: '',
+              college: '',
+            ),
+        '/FacultyProfilePage': (context) => FacultyProfilePage(
+              collegeName: '',
+              college: '',
+            ),
+        '/AdminProfilePage': (context) => AdminProfilePage(
+              collegeName: '',
+              college: '',
+            ),
       },
       onUnknownRoute: (settings) => MaterialPageRoute(
         builder: (context) => Scaffold(

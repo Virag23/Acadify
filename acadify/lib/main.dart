@@ -1,3 +1,6 @@
+import 'package:acadify/screens/Admin_profile_page.dart';
+import 'package:acadify/screens/Faculty_profile_page.dart';
+import 'package:acadify/screens/Student_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -109,6 +112,18 @@ class _MyAppState extends State<MyApp> {
               college: '',
             ),
         '/adminHome': (context) => AdminHomePage(
+              collegeName: '',
+              college: '',
+            ),
+        '/StudentProfilePage': (context) => StudentProfilePage(
+              collegeName: '',
+              college: '',
+            ),
+        '/FacultyProfilePage': (context) => FacultyProfilePage(
+              collegeName: '',
+              college: '',
+            ),
+        '/AdminProfilePage': (context) => AdminProfilePage(
               collegeName: '',
               college: '',
             ),

@@ -106,7 +106,6 @@ class _FacultyLoginState extends State<FacultyLogin> {
 
       if (response.statusCode == 200) {
         final userDetails = jsonDecode(response.body);
-        print("Faculty Details Saved: $userDetails");
 
         await saveLoginStatus(
             true,
@@ -181,7 +180,7 @@ class _FacultyLoginState extends State<FacultyLogin> {
                     collegeName ?? 'Loading...',
                     textAlign: TextAlign
                         .center, // Ensures text alignment within the widget
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -190,7 +189,7 @@ class _FacultyLoginState extends State<FacultyLogin> {
                 child: Center(
                   child: Text('Faculty Login',
                       style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
                 ),
               ),
               SizedBox(height: 15),

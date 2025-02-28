@@ -1,3 +1,4 @@
+import 'package:acadify/screens/Faculty_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,7 +53,6 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
       number = prefs.getString('number') ?? 'N/A';
       department = prefs.getString('department') ?? 'N/A';
     });
-    print("Loaded Faculty Details - Name: $name, Email: $email");
   }
 
   Future<bool> _onWillPop() async {
@@ -93,7 +93,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -132,6 +132,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                     crossAxisSpacing: 15,
                     mainAxisSpacing: 15,
                     children: [
+                      featureCard(Icons.person, "Profile"),
                       featureCard(Icons.assignment, "Assignments"),
                       featureCard(Icons.book, "E-Library"),
                       featureCard(Icons.school, "Attendance"),
@@ -152,7 +153,20 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          if (title == "Profile") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => FacultyProfilePage(
+                        collegeName: collegeName ?? '',
+                        college: '',
+                      )),
+            );
+          } else {
+            print("$title clicked");
+          }
+        },
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

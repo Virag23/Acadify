@@ -141,6 +141,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
       });
 
       if (response.statusCode == 201) {
+        // ignore: unused_local_variable
         final name = jsonDecode(response.body)['name'];
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -160,8 +161,10 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
             numberController.text,
             selectedDepartment!);
 
-        showSnackbar(context,
-            'Faculty registered successfully, Welcome, $name!', Colors.green);
+        showSnackbar(
+            context,
+            'Faculty registered successfully, Welcome, $nameController',
+            Colors.green);
 
         Navigator.pushReplacement(
             context,
@@ -221,7 +224,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
                   collegeName ?? 'Loading...',
                   textAlign: TextAlign
                       .center, // Ensures text alignment within the widget
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -230,7 +233,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
               child: Center(
                 child: Text('Faculty Registration',
                     style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
               ),
             ),
             SizedBox(height: 15),

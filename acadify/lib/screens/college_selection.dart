@@ -137,7 +137,7 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
               padding: EdgeInsets.only(bottom: 20.0),
               child: Text(
                 'Select Institute',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
               ),
             ),
             DropdownButton<String>(

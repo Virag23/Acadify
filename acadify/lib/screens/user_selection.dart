@@ -98,7 +98,7 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                 collegeName ?? 'Loading...',
                 textAlign: TextAlign
                     .center, // Ensures text alignment within the widget
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -106,7 +106,7 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
           Center(
             child: Text(
               'User Selection',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
             ),
           ),
           Expanded(

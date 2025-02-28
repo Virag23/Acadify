@@ -191,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                     collegeName ?? 'Loading...',
                     textAlign: TextAlign
                         .center, // Ensures text alignment within the widget
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -200,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Center(
                   child: Text('Student Login',
                       style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
                 ),
               ),
               SizedBox(height: 15),

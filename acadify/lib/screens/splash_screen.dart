@@ -87,33 +87,29 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(
+            colors: [
+              Color.fromARGB(255, 63, 133, 255),
+              Color.fromARGB(255, 71, 196, 254)
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         child: Center(
-          child: ShaderMask(
-            shaderCallback: (bounds) => const LinearGradient(
-              colors: [
-                Color.fromARGB(255, 63, 133, 255),
-                Color.fromARGB(255, 71, 196, 254)
+          child: Text(
+            displayedText,
+            style: const TextStyle(
+              fontSize: 60,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  blurRadius: 20.0,
+                  color: Colors.black38,
+                  offset: Offset(4.0, 4.0),
+                ),
               ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ).createShader(bounds),
-            child: Text(
-              displayedText,
-              style: const TextStyle(
-                fontSize: 60,
-                fontWeight: FontWeight.bold,
-                color: Colors
-                    .white, // Set the color to white to apply the gradient
-                shadows: [
-                  Shadow(
-                    blurRadius: 20.0,
-                    color: Colors.black38,
-                    offset: Offset(4.0, 4.0),
-                  ),
-                ],
-              ),
             ),
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:acadify/screens/Admin_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -85,8 +86,6 @@ class _AdminHomePage extends State<AdminHomePage> {
       semester = prefs.getString('semester') ?? 'N/A';
       division = prefs.getString('division') ?? 'N/A';
     });
-    print(
-        "Loaded Admin Details - Name: $name, Email: $email, Number: $number, Department: $department, Year: $year, Semester: $semester, Division: $division");
   }
 
   void showSnackbar(BuildContext context, String message, Color color) {
@@ -135,7 +134,7 @@ class _AdminHomePage extends State<AdminHomePage> {
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -173,6 +172,7 @@ class _AdminHomePage extends State<AdminHomePage> {
                     crossAxisSpacing: 15,
                     mainAxisSpacing: 15,
                     children: [
+                      featureCard(Icons.person, "Profile"),
                       featureCard(Icons.schedule, "Timetable"),
                       featureCard(Icons.event, "Academic Calendar"),
                       featureCard(Icons.access_time, "Exam Schedule"),
@@ -199,7 +199,15 @@ class _AdminHomePage extends State<AdminHomePage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
         onTap: () {
-          if (title == "Timetable") {
+          if (title == "Profile") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AdminProfilePage(
+                        collegeName: collegeName ?? '',
+                        college: '',
+                      )),
+            );
           } else {
             print("$title clicked");
           }

@@ -159,6 +159,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
       );
 
       if (response.statusCode == 201) {
+        // ignore: unused_local_variable
         final name = jsonDecode(response.body)['name'];
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -187,8 +188,8 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
             selectedSemester!,
             rollNoController.text);
 
-        showSnackbar(
-            context, 'Registered successfully, Welcome, $name!', Colors.green);
+        showSnackbar(context,
+            'Registered successfully, Welcome, $nameController', Colors.green);
 
         Navigator.pushReplacement(
             context,
@@ -240,7 +241,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   collegeName ?? 'Loading...',
                   textAlign: TextAlign
                       .center, // Ensures text alignment within the widget
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -249,7 +250,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
               child: Center(
                 child: Text('Student Registration',
                     style:
-                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
               ),
             ),
             SizedBox(height: 15),
