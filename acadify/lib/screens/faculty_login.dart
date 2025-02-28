@@ -2,17 +2,27 @@ import 'package:acadify/screens/faculty_registration.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:acadify/screens/faculty_home.dart';
-import 'package:acadify/Screens/college_selection.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName, String college) async {
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
-  await prefs.setString('userRole', role);
-  await prefs.setString('college_name', collegeName);
-  await prefs.setString('college', college);
+  await prefs.setString('userRole', role); // Save user role
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
 }
 
 class FacultyLogin extends StatefulWidget {
@@ -47,27 +57,30 @@ class _FacultyLoginState extends State<FacultyLogin> {
       college = prefs.getString('college_name');
     });
 
-    if (collegeName == null || college == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => CollegeSelectionPage()),
-        );
-      });
+    if (college == null || collegeName == null) {
+      showSnackbar(context, "Error: College name not found!", Colors.red);
     }
   }
 
+  Future<void> saveFacultyDetails(Map<String, dynamic> userDetails) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('name', userDetails['name']);
+    await prefs.setString('email', userDetails['email']);
+    await prefs.setString('number', userDetails['number']);
+    await prefs.setString('department', userDetails['department']);
+  }
+
   Future<void> loginFaculty(BuildContext context) async {
-    if (collegeName == null) {
-      showSnackbar(context, "Error: No college selected!", Colors.red);
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      showSnackbar(context, 'Please fill in all fields!', Colors.red);
       return;
     }
 
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please fill in all fields!'),
-        backgroundColor: Colors.red,
-      ));
+    if (!RegExp(r"^[a-zA-Z0-9._%+-]+@college\.org$")
+        .hasMatch(emailController.text)) {
+      showSnackbar(context, "Please enter a valid email address!", Colors.red);
       return;
     }
 
@@ -76,7 +89,7 @@ class _FacultyLoginState extends State<FacultyLogin> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.108.47:5000/api/facultylogin');
+      final url = Uri.parse('http://192.168.123.47:5000/api/facultylogin');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -92,23 +105,33 @@ class _FacultyLoginState extends State<FacultyLogin> {
       });
 
       if (response.statusCode == 200) {
-        final name = jsonDecode(response.body)['name'];
+        final userDetails = jsonDecode(response.body);
+        print("Faculty Details Saved: $userDetails");
 
-        // Save login status
-        await saveLoginStatus(true, "faculty", collegeName!, college!);
+        await saveLoginStatus(
+            true,
+            "faculty",
+            collegeName!,
+            college!,
+            userDetails['name'],
+            userDetails['email'],
+            userDetails['number'],
+            userDetails['department']);
+        await saveFacultyDetails(userDetails);
 
-        showSnackbar(context, 'Welcome, $name!', Colors.green);
+        showSnackbar(context, 'Welcome, ${userDetails['name']}!', Colors.green);
 
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => FacultyHomePage(
-                    collegeName: collegeName ?? '', college: college ?? '')));
+          context,
+          MaterialPageRoute(
+              builder: (context) => FacultyHomePage(
+                    collegeName: collegeName ?? '',
+                    college: college ?? '',
+                  )),
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Login failed. Please check your credentials.'),
-          backgroundColor: Colors.red,
-        ));
+        showSnackbar(
+            context, 'Invalid Credentials! Please try again.', Colors.red);
       }
     } catch (e) {
       setState(() {
@@ -119,6 +142,15 @@ class _FacultyLoginState extends State<FacultyLogin> {
         backgroundColor: Colors.red,
       ));
     }
+  }
+
+  void showSnackbar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      ),
+    );
   }
 
   @override
@@ -229,6 +261,4 @@ class _FacultyLoginState extends State<FacultyLogin> {
       ),
     );
   }
-
-  void showSnackbar(BuildContext context, String s, MaterialColor red) {}
 }

@@ -6,12 +6,31 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName, String college) async {
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department,
+    String year,
+    String division,
+    String semester,
+    String rollNo) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('isLoggedIn', status);
-  await prefs.setString('userRole', role);
-  await prefs.setString('college_name', collegeName);
-  await prefs.setString('college', college);
+  await prefs.setBool('isLoggedIn', status); // Save login status
+  await prefs.setString('userRole', role); // Save user role
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
+  await prefs.setString('year', year); // Save year
+  await prefs.setString('division', division); // Save division
+  await prefs.setString('semester', semester); // Save semester
+  await prefs.setString('roll_no', rollNo); // Save roll number
 }
 
 class LoginPage extends StatefulWidget {
@@ -51,6 +70,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> saveStudentDetails(Map<String, dynamic> userDetails) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('name', userDetails['name']);
+    await prefs.setString('email', userDetails['email']);
+    await prefs.setString('number', userDetails['number']);
+    await prefs.setString('prn', userDetails['prn']);
+    await prefs.setString('department', userDetails['department']);
+    await prefs.setString('year', userDetails['year']);
+    await prefs.setString('semester', userDetails['semester']);
+    await prefs.setString('division', userDetails['division']);
+    await prefs.setString('roll_no', userDetails['roll_no']);
+  }
+
   Future<void> login(BuildContext context) async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       showSnackbar(context, 'Please fill in all fields!', Colors.red);
@@ -68,9 +102,8 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.108.47:5000/api/login');
       final response = await http.post(
-        url,
+        Uri.parse('http://192.168.123.47:5000/api/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'college': college,
@@ -84,17 +117,33 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       if (response.statusCode == 200) {
-        final name = jsonDecode(response.body)['name'];
+        final userDetails = jsonDecode(response.body);
 
-        await saveLoginStatus(true, "student", collegeName!, college!);
+        await saveLoginStatus(
+            true,
+            "student",
+            collegeName!,
+            college!,
+            userDetails['name'],
+            userDetails['email'],
+            userDetails['number'],
+            userDetails['department'],
+            userDetails['year'],
+            userDetails['division'],
+            userDetails['semester'],
+            userDetails['roll_no']);
+        await saveStudentDetails(userDetails);
 
-        showSnackbar(context, 'Welcome, $name!', Colors.green);
+        showSnackbar(context, 'Welcome, ${userDetails['name']}!', Colors.green);
 
         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => HomePage(
-                    collegeName: collegeName ?? '', college: college ?? '')));
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomePage(
+                    collegeName: collegeName ?? '',
+                    college: college ?? '',
+                  )),
+        );
       } else {
         showSnackbar(
             context, 'Invalid Credentials! Please try again.', Colors.red);

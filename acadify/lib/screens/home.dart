@@ -1,6 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+Future<void> saveLoginStatus(
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department,
+    String year,
+    String division,
+    String semester,
+    String rollNo) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', status); // Save login status
+  await prefs.setString('userRole', role); // Save user role
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
+  await prefs.setString('year', year); // Save year
+  await prefs.setString('division', division); // Save division
+  await prefs.setString('semester', semester); // Save semester
+  await prefs.setString('roll_no', rollNo); // Save roll number
+}
+
 class HomePage extends StatefulWidget {
   final String collegeName;
   final String college;
@@ -14,19 +42,50 @@ class HomePage extends StatefulWidget {
 class _StudentHomePageState extends State<HomePage> {
   String? collegeName;
   String? college;
+  String name = '',
+      email = '',
+      number = '',
+      prn = '',
+      department = '',
+      year = '',
+      semester = '',
+      division = '',
+      rollNo = '';
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadCollegeName();
+    _loadStudentDetails();
   }
 
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name') ?? widget.collegeName;
-      college = prefs.getString('college') ?? widget.college;
+      collegeName = prefs.getString('college_full_name') ?? widget.collegeName;
+      college = prefs.getString('college_name') ?? widget.college;
     });
+  }
+
+  Future<void> _loadStudentDetails() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      collegeName = prefs.getString('college_full_name') ?? widget.collegeName;
+      college = prefs.getString('college_name') ?? widget.college;
+      name = prefs.getString('name') ?? 'N/A';
+      email = prefs.getString('email') ?? 'N/A';
+      number = prefs.getString('number') ?? 'N/A';
+      prn = prefs.getString('prn') ?? 'N/A';
+      department = prefs.getString('department') ?? 'N/A';
+      year = prefs.getString('year') ?? 'N/A';
+      semester = prefs.getString('semester') ?? 'N/A';
+      division = prefs.getString('division') ?? 'N/A';
+      rollNo = prefs.getString('roll_no') ?? 'N/A';
+    });
+    print(
+        "Loaded Student Details - Name: $name, Email: $email, Number: $number, PRN: $prn, Department: $department, Year: $year, Semester: $semester, Division: $division, Roll No: $rollNo");
   }
 
   // Prevent Back Navigation
@@ -68,7 +127,7 @@ class _StudentHomePageState extends State<HomePage> {
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
@@ -79,16 +138,16 @@ class _StudentHomePageState extends State<HomePage> {
                     children: [
                       // Profile Icon
                       CircleAvatar(
-                        radius: 35,
+                        radius: 40,
                         backgroundColor: Colors.blue.shade100,
                         child: Icon(Icons.person, size: 35, color: Colors.blue),
                       ),
                       SizedBox(width: 15),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'Welcome, {name ?? "Loading..."}!',
+                            'Welcome, $name',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),

@@ -56,9 +56,9 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
   Future<void> fetchColleges() async {
     try {
       final collegeResponse =
-          await http.get(Uri.parse('http://192.168.108.47:5000/api/colleges'));
+          await http.get(Uri.parse('http://192.168.123.47:5000/api/colleges'));
       final nameResponse =
-          await http.get(Uri.parse('http://192.168.108.47:5000/api/names'));
+          await http.get(Uri.parse('http://192.168.123.47:5000/api/names'));
 
       if (collegeResponse.statusCode == 200 && nameResponse.statusCode == 200) {
         final List<dynamic> collegeList = jsonDecode(collegeResponse.body);
@@ -91,7 +91,7 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
 
     setState(() => isLoading = true);
     final response = await http.post(
-      Uri.parse('http://192.168.108.47:5000/api/verify_college'),
+      Uri.parse('http://192.168.123.47:5000/api/verify_college'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         "college_full_name": selectedCollege,

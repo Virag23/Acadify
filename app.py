@@ -148,7 +148,7 @@ def api_login():
     data = request.get_json()
     college = data.get('college', '').strip()
     print(f"Received college_name: '{college}'")
-
+    
     if not college:
         return jsonify({"error": "College name is required!"}), 400
 
@@ -167,7 +167,18 @@ def api_login():
     conn.close()
 
     if user and bcrypt.check_password_hash(user['password'], password):
-        return jsonify({"message": "Login successful!", "name": user['name']}), 200
+        return jsonify({
+            "message": "Login successful!",
+            "name": user['name'],
+            "email": user['email'],
+            "number": user['number'],
+            "prn": user['prn'],
+            "department": user['department'],
+            "year": user['year'],
+            "semester": user['semester'],
+            "division": user['division'],
+            "roll_no": user['roll_no']
+        }), 200
     else:
         return jsonify({"error": "Invalid credentials"}), 401
 
@@ -176,6 +187,8 @@ def api_login():
 def register_faculty():
     data = request.get_json()
     college = data.get('college', '').strip()
+    print(f"Received college_name: '{college}'")
+    
     if not college:
         return jsonify({"error": "College name is required!"}), 400
 
@@ -214,6 +227,8 @@ def register_faculty():
 def api_facultylogin():
     data = request.get_json()
     college = data.get('college', '').strip()
+    print(f"Received college_name: '{college}'")
+    
     if not college:
         return jsonify({"error": "College name is required!"}), 400
 
@@ -222,7 +237,7 @@ def api_facultylogin():
     
     email = data.get('email')
     password = data.get('password')
-    
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute(f"SELECT * FROM {table_name} WHERE email = %s", (email,))
@@ -232,20 +247,28 @@ def api_facultylogin():
     conn.close()
 
     if user and bcrypt.check_password_hash(user['password'], password):
-        return jsonify({"message": "Login successful!", "name": user['name']}), 200
+        return jsonify({
+            "message": "Login successful!",
+            "name": user['name'],
+            "email": user['email'],
+            "number": user['number'],
+            "department": user['department']
+        }), 200
     else:
-        return jsonify({"error": "Invalid credentials"}), 40
+        return jsonify({"error": "Invalid credentials"}), 401
 
 # API for Admin Registration
 @app.route('/api/adminRegister', methods=['POST'])
 def register_admin():
     data = request.get_json()
     college= data.get('college', '').strip()
+    print(f"Received college_name: '{college}'")
     
     if not college:
         return jsonify({"error": "College name is required!"}), 400
 
     table_name = get_college_table_name(college, "admin")
+    print(f"Trying to access table: {table_name}")
 
     name = data.get('name')
     email = data.get('email')
@@ -281,14 +304,17 @@ def register_admin():
 @app.route('/api/adminLogin', methods=['POST'])
 def api_adminLogin():
     data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
     college = data.get('college', '').strip()
+    print(f"Received college_name: '{college}'")
     
     if not college:
         return jsonify({"error": "College name is required!"}), 400
 
     table_name = get_college_table_name(college, "admin")
+    print(f"Trying to access table: {table_name}")
+    
+    email = data.get('email')
+    password = data.get('password')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -299,158 +325,18 @@ def api_adminLogin():
     conn.close()
 
     if user and bcrypt.check_password_hash(user['password'], password):
-        return jsonify({"message": "Login successful!", "name": user['name']}), 200
+        return jsonify({
+            "message": "Login successful!",
+            "name": user['name'],
+            "email": user['email'],
+            "number": user['number'],
+            "department": user['department'],
+            "year": user['year'],
+            "semester": user['semester'],
+            "division": user['division']
+        }), 200
     else:
         return jsonify({"error": "Invalid credentials"}), 401
-
-def get_college_table_name(college_name, role):
-    return f"{college_name.lower()}_{role}"
-
-@app.route('/api/adminDetails', methods=['POST'])
-def admin_details():
-    data = request.get_json()
-    college_name = data.get("college_name", "").strip()
-
-    if not college_name:
-        return jsonify({"status": "error", "message": "College name is required"}), 400
-
-    table_name = get_college_table_name(college_name, "admin")
-
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    try:
-        cursor.execute(f"SELECT * FROM `{table_name}` LIMIT 1")
-        user = cursor.fetchone()
-
-        if user:
-            return jsonify({
-                "status": "success",
-                "college_full_name": user["college_full_name"],
-                "admin_name": user["name"],
-                "department": user["department"],
-                "year": user["year"],
-                "division": user["division"],
-                "semester": user["semester"]
-            })
-        else:
-            return jsonify({"status": "error", "message": "Admin details not found"}), 404
-    except mysql.connector.Error as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-    finally:
-        cursor.close()
-        conn.close()
-
-def create_timetable_table(college_name):
-    table_name = f"{college_name}_timetable"  # Table name dynamically based on college name
     
-    query = f"""
-    CREATE TABLE IF NOT EXISTS {table_name} (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        department VARCHAR(100) NOT NULL,
-        year VARCHAR(10) NOT NULL,
-        division VARCHAR(10) NOT NULL,
-        day VARCHAR(20) NOT NULL,
-        start_time TIME NOT NULL,
-        end_time TIME NOT NULL,
-        subject VARCHAR(255) NOT NULL,
-        faculty_id VARCHAR(255) NOT NULL,
-        faculty_name VARCHAR(255),
-        admin_id VARCHAR(255) NOT NULL
-    );
-    """
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(query)
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-@app.route("/add_timetable", methods=["POST"])
-def add_timetable():
-    data = request.json
-    college_name = data["college_name"].strip()
-    if not college_name:
-        return jsonify({"status": "error", "message": "College name is required"}), 400
-    
-    table_name = f"{college_name}_timetable"  # Build the table name dynamically
-
-    query = f"""
-    INSERT INTO {table_name} (department, year, division, day, start_time, end_time, subject, faculty_id, faculty_name, admin_id)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    
-    values = (
-        data["department"], data["year"], data["division"], data["day"],
-        data["start_time"], data["end_time"], data["subject"],
-        data["faculty_id"], data["faculty_name"], data["admin_id"]
-    )
-
-    conn = get_db_connection()  # Establish database connection
-    cursor = conn.cursor()
-    cursor.execute(query, values)  # Execute query to insert data
-    conn.commit()  # Commit the transaction
-    
-    cursor.close()
-    conn.close()
-    
-    return jsonify({"message": "Timetable added successfully"}), 200
-
-@app.route("/get_timetable", methods=["GET"])
-def get_timetable():
-    college_name = request.args.get("college_name").strip()
-    
-    if not college_name:
-        return jsonify({"status": "error", "message": "College name is required"}), 400
-    table_name = f"{college_name}_timetable"  # Use correct table name
-
-    department = request.args.get("department")
-    year = request.args.get("year")
-    division = request.args.get("division")
-
-    query = f"""
-    SELECT day, start_time, end_time, subject, faculty_name
-    FROM {table_name}
-    WHERE department = %s AND year = %s AND division = %s
-    ORDER BY day, start_time
-    """
-    
-    conn = get_db_connection()  # Establish connection
-    cursor = conn.cursor()
-    cursor.execute(query, (department, year, division))  # Fetch timetable
-    timetable = cursor.fetchall()  # Get all rows
-    
-    cursor.close()
-    conn.close()
-    
-    return jsonify(timetable), 200
-
-@app.route("/get_faculty_timetable", methods=["GET"])
-def get_faculty_timetable():
-    college_name = request.args.get("college_name").strip()
-    faculty_id = request.args.get("faculty_id")
-    
-    if not college_name:
-        return jsonify({"status": "error", "message": "College name is required"}), 400
-    table_name = f"{college_name}_timetable"
-    
-    query = f"""
-    SELECT day, start_time, end_time, subject
-    FROM {table_name}
-    WHERE faculty_id = %s
-    ORDER BY day, start_time
-    """
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(query, (faculty_id,))
-    timetable = cursor.fetchall()
-    
-    cursor.close()
-    conn.close()
-    
-    return jsonify(timetable), 200
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

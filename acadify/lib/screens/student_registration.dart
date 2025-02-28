@@ -6,12 +6,31 @@ import 'package:http/http.dart' as http; // HTTP requests
 import 'package:shared_preferences/shared_preferences.dart'; // For storing user data
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName, String college) async {
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department,
+    String year,
+    String division,
+    String semester,
+    String rollNo) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
   await prefs.setString('userRole', role); // Save user role
-  await prefs.setString('college_name', collegeName); // Save college name
-  await prefs.setString('college', college); // Save college
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
+  await prefs.setString('year', year); // Save year
+  await prefs.setString('division', division); // Save division
+  await prefs.setString('semester', semester); // Save semester
+  await prefs.setString('roll_no', rollNo); // Save roll number
 }
 
 class StudentRegistrationPage extends StatefulWidget {
@@ -122,7 +141,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.108.47:5000/api/register'),
+        Uri.parse('http://192.168.123.47:5000/api/register'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "college": college, // Send college name dynamically
@@ -141,14 +160,32 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
 
       if (response.statusCode == 201) {
         final name = jsonDecode(response.body)['name'];
-        // Save login status and user details in SharedPreferences
+
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('is_logged_in', true); // Set login status to true
         await prefs.setString('name', nameController.text);
         await prefs.setString('email', emailController.text);
+        await prefs.setString('number', phoneController.text);
         await prefs.setString('prn', prnController.text);
+        await prefs.setString('department', selectedDepartment!);
+        await prefs.setString('year', selectedYear!);
+        await prefs.setString('semester', selectedSemester!);
+        await prefs.setString('division', selectedDivision!);
+        await prefs.setString('roll_no', rollNoController.text);
 
-        await saveLoginStatus(true, "student", collegeName!, college!);
+        await saveLoginStatus(
+            true,
+            "student",
+            collegeName!,
+            college!,
+            nameController.text,
+            emailController.text,
+            phoneController.text,
+            selectedDepartment!,
+            selectedYear!,
+            selectedDivision!,
+            selectedSemester!,
+            rollNoController.text);
 
         showSnackbar(
             context, 'Registered successfully, Welcome, $name!', Colors.green);

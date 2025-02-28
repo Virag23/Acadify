@@ -1,7 +1,31 @@
-import 'package:acadify/screens/admin_timetable_screen.dart';
-import 'package:acadify/screens/college_selection.dart'; // Import CollegeSelectionPage
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+Future<void> saveLoginStatus(
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department,
+    String year,
+    String division,
+    String semester) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', status); // Save login status
+  await prefs.setString('userRole', role); // Save user role
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
+  await prefs.setString('year', year); // Save year
+  await prefs.setString('division', division); // Save division
+  await prefs.setString('semester', semester); // Save semester
+}
 
 class AdminHomePage extends StatefulWidget {
   final String collegeName;
@@ -16,12 +40,23 @@ class AdminHomePage extends StatefulWidget {
 class _AdminHomePage extends State<AdminHomePage> {
   String? collegeName;
   String? college; //
+  String name = '',
+      email = '',
+      number = '',
+      prn = '',
+      department = '',
+      year = '',
+      semester = '',
+      division = '',
+      rollNo = '';
+
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadCollegeName();
+    _loadAdminDetails();
   }
 
   Future<void> _loadCollegeName() async {
@@ -34,6 +69,24 @@ class _AdminHomePage extends State<AdminHomePage> {
     if (collegeName == null) {
       showSnackbar(context, "Error: College name not found!", Colors.red);
     }
+  }
+
+  Future<void> _loadAdminDetails() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      collegeName = prefs.getString('college_full_name') ?? widget.collegeName;
+      college = prefs.getString('college_name') ?? widget.college;
+      name = prefs.getString('name') ?? 'N/A';
+      email = prefs.getString('email') ?? 'N/A';
+      number = prefs.getString('number') ?? 'N/A';
+      department = prefs.getString('department') ?? 'N/A';
+      year = prefs.getString('year') ?? 'N/A';
+      semester = prefs.getString('semester') ?? 'N/A';
+      division = prefs.getString('division') ?? 'N/A';
+    });
+    print(
+        "Loaded Admin Details - Name: $name, Email: $email, Number: $number, Department: $department, Year: $year, Semester: $semester, Division: $division");
   }
 
   void showSnackbar(BuildContext context, String message, Color color) {
@@ -82,7 +135,7 @@ class _AdminHomePage extends State<AdminHomePage> {
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
@@ -101,7 +154,7 @@ class _AdminHomePage extends State<AdminHomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome, {name ?? "Loading..."}!',
+                            'Welcome, $name',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -147,12 +200,6 @@ class _AdminHomePage extends State<AdminHomePage> {
       child: InkWell(
         onTap: () {
           if (title == "Timetable") {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      AdminTimetableScreen(collegeName: collegeName ?? '')),
-            );
           } else {
             print("$title clicked");
           }
@@ -182,13 +229,7 @@ class _AdminHomePage extends State<AdminHomePage> {
 
   Future<void> _logout(BuildContext context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-
-    // Navigate to College Selection Page
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => CollegeSelectionPage()),
-      (route) => false,
-    );
+    await prefs.clear();
+    Navigator.pushReplacementNamed(context, '/collegeSelection');
   }
 }

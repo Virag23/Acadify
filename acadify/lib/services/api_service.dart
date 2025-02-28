@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.108.47:5000';
+  static const String baseUrl = 'http://192.168.123.47:5000';
 
   // ✅ Fetch Admin Details
   static Future<Map<String, dynamic>> getAdminDetails() async {
