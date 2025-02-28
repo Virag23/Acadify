@@ -36,6 +36,10 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
     if (collegeName == null || college == null) {
       Future.delayed(Duration.zero, () {
         showSnackbar(context, "Error: College name not found!", Colors.red);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CollegeSelectionPage()),
+        );
       });
     }
   }
@@ -131,7 +135,7 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                           MaterialPageRoute(
                               builder: (context) => FacultyRegistrationPage(
                                     collegeName: collegeName ?? '',
-                                    college: '',
+                                    college: college ?? '',
                                   )));
                     },
                   ),
@@ -144,7 +148,7 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
                           MaterialPageRoute(
                               builder: (context) => AdminRegistrationPage(
                                     collegeName: collegeName ?? '',
-                                    college: '',
+                                    college: college ?? '',
                                   )));
                     },
                   ),

@@ -1,4 +1,3 @@
-import 'package:acadify/screens/admin_timetable_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -112,9 +111,6 @@ class _MyAppState extends State<MyApp> {
         '/adminHome': (context) => AdminHomePage(
               collegeName: '',
               college: '',
-            ),
-        '/adminTimeTable': (context) => AdminTimetableScreen(
-              collegeName: '',
             ),
       },
       onUnknownRoute: (settings) => MaterialPageRoute(

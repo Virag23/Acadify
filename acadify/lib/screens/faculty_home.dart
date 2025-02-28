@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+Future<void> saveLoginStatus(
+    bool status, String role, String collegeName, String college) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setBool('isLoggedIn', status);
+  await prefs.setString('userRole', role);
+  await prefs.setString('college_full_name', collegeName);
+  await prefs.setString('college_name', college);
+}
+
 class FacultyHomePage extends StatefulWidget {
   final String collegeName;
   final String college;
@@ -14,36 +23,39 @@ class FacultyHomePage extends StatefulWidget {
 class _FacultyHomePageState extends State<FacultyHomePage> {
   String? collegeName;
   String? college;
+  String name = '', email = '', number = '', department = '';
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadCollegeName();
+    _loadFacultyDetails();
   }
 
   Future<void> _loadCollegeName() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      collegeName = prefs.getString('college_name') ?? widget.collegeName;
-      college = prefs.getString('college') ?? widget.college;
+      collegeName = prefs.getString('college_full_name') ?? widget.collegeName;
+      college = prefs.getString('college_name') ?? widget.college;
     });
-
-    if (collegeName == null || college == null) {
-      showSnackbar(context, "Error: College name not found!", Colors.red);
-    }
   }
 
-  void showSnackbar(BuildContext context, String message, Color color) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: color,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  Future<void> _loadFacultyDetails() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      collegeName = prefs.getString('college_full_name') ?? widget.collegeName;
+      college = prefs.getString('college_name') ?? widget.college;
+      name = prefs.getString('name') ?? 'N/A';
+      email = prefs.getString('email') ?? 'N/A';
+      number = prefs.getString('number') ?? 'N/A';
+      department = prefs.getString('department') ?? 'N/A';
+    });
+    print("Loaded Faculty Details - Name: $name, Email: $email");
   }
 
   Future<bool> _onWillPop() async {
-    // Return false to stop going back, true to allow it
     return false; // Disable back button
   }
 
@@ -81,7 +93,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
@@ -92,16 +104,16 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                     children: [
                       // Profile Icon
                       CircleAvatar(
-                        radius: 35,
+                        radius: 40,
                         backgroundColor: Colors.blue.shade100,
                         child: Icon(Icons.person, size: 35, color: Colors.blue),
                       ),
                       SizedBox(width: 15), SizedBox(width: 15),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            'Welcome, {name ?? "Loading..."}!',
+                            'Welcome, $name',
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),

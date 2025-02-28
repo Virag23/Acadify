@@ -6,12 +6,23 @@ import 'package:http/http.dart' as http; // HTTP requests
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName, String college) async {
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
   await prefs.setString('userRole', role); // Save user role
-  await prefs.setString('college_name', collegeName); // Save college name
-  await prefs.setString('college', college); // Save college
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
 }
 
 class FacultyRegistrationPage extends StatefulWidget {
@@ -60,13 +71,15 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
       college = prefs.getString('college_name');
     });
 
-    if (collegeName == null) {
-      showSnackbar(context, "Error: College name not found!", Colors.red);
+    if (collegeName == null || college == null) {
+      Future.delayed(Duration.zero, () {
+        showSnackbar(context, "Error: College name not found!", Colors.red);
+      });
     }
   }
 
   Future<void> registerFaculty(BuildContext context) async {
-    if (collegeName == null) {
+    if (collegeName == null || college == null) {
       showSnackbar(context, "Error: No college selected!", Colors.red);
       return;
     }
@@ -98,7 +111,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
         !RegExp(r'^[0-9]+$').hasMatch(numberController.text)) {
       print("Invalid phone number!"); // Debug Log 3
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please enter a valid phone number!'),
+        content: Text('Please enter a valid 10-digit phone number!'),
         backgroundColor: Colors.red,
       ));
       return;
@@ -109,7 +122,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.108.47:5000/api/facultyregister');
+      final url = Uri.parse('http://192.168.123.47:5000/api/facultyregister');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -132,22 +145,31 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('is_logged_in', true); // Set login status to true
-        await prefs.setString('user_name', nameController.text);
-        await prefs.setString('user_email', emailController.text);
-        await prefs.setString('user_number', numberController.text);
-        await prefs.setString('user_department', selectedDepartment!);
+        await prefs.setString('name', nameController.text);
+        await prefs.setString('email', emailController.text);
+        await prefs.setString('number', numberController.text);
+        await prefs.setString('department', selectedDepartment!);
 
-        await saveLoginStatus(true, "faculty", collegeName!, college!);
+        await saveLoginStatus(
+            true,
+            "faculty",
+            collegeName!,
+            college!,
+            nameController.text,
+            emailController.text,
+            numberController.text,
+            selectedDepartment!);
 
         showSnackbar(context,
             'Faculty registered successfully, Welcome, $name!', Colors.green);
 
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  FacultyHomePage(collegeName: collegeName ?? '', college: '')),
-        );
+            context,
+            MaterialPageRoute(
+                builder: (context) => FacultyHomePage(
+                      collegeName: collegeName ?? '',
+                      college: college ?? '',
+                    )));
       } else {
         final error = jsonDecode(response.body)['error'] ?? 'Unknown error';
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

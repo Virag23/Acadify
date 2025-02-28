@@ -6,12 +6,29 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName, String college) async {
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department,
+    String year,
+    String division,
+    String semester) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('isLoggedIn', status); // Save login status
   await prefs.setString('userRole', role); // Save user role
-  await prefs.setString('college_name', collegeName); // Save college name
-  await prefs.setString('college', college); // Save college
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
+  await prefs.setString('year', year); // Save year
+  await prefs.setString('division', division); // Save division
+  await prefs.setString('semester', semester); // Save semester
 }
 
 class AdminRegistrationPage extends StatefulWidget {
@@ -113,7 +130,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.108.47:5000/api/adminRegister');
+      final url = Uri.parse('http://192.168.123.47:5000/api/adminRegister');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -134,41 +151,56 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
         isLoading = false;
       });
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 201) {
         final name = jsonDecode(response.body)['name'];
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('is_logged_in', true); // Set login status to true
-        await prefs.setString('user_name', nameController.text);
-        await prefs.setString('user_email', emailController.text);
+        await prefs.setString('name', nameController.text);
+        await prefs.setString('email', emailController.text);
 
-        await saveLoginStatus(true, "admin", collegeName!, college!);
+        await saveLoginStatus(
+            true,
+            "admin",
+            collegeName!,
+            college!,
+            nameController.text,
+            emailController.text,
+            numberController.text,
+            selectedDepartment!,
+            selectedYear!,
+            selectedDivision!,
+            selectedSemester!);
 
         showSnackbar(context, 'Admin registered successfully, Welcome, $name!',
             Colors.green);
 
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AdminHomePage(
-                  collegeName: collegeName ?? '', college: college ?? '')),
-        );
+            context,
+            MaterialPageRoute(
+                builder: (context) => AdminHomePage(
+                      collegeName: collegeName ?? '',
+                      college: college ?? '',
+                    )));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Registration failed! Please try again.'),
-          backgroundColor: Colors.red,
-        ));
+        final error = jsonDecode(response.body)['error'] ?? "Unknown error";
+        showSnackbar(context, "Registration Failed: $error", Colors.red);
       }
     } catch (e) {
+      showSnackbar(context,
+          "Error: Unable to register. Please try again later.", Colors.red);
+    } finally {
       setState(() {
         isLoading = false;
       });
-      print("Error: $e"); // Debugging
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error: Unable to register. Please try again later.'),
-        backgroundColor: Colors.red,
-      ));
     }
+  }
+
+  void showSnackbar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    ));
   }
 
   @override

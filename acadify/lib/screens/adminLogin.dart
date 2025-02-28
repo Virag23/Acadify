@@ -3,16 +3,32 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:acadify/Screens/college_selection.dart';
 import 'package:acadify/screens/adminHome.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName, String college) async {
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department,
+    String year,
+    String division,
+    String semester) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('isLoggedIn', status);
-  await prefs.setString('userRole', role);
-  await prefs.setString('college_name', collegeName);
-  await prefs.setString('college', college);
+  await prefs.setBool('isLoggedIn', status); // Save login status
+  await prefs.setString('userRole', role); // Save user role
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number); // Save phone number
+  await prefs.setString('department', department); // Save department
+  await prefs.setString('year', year); // Save year
+  await prefs.setString('division', division); // Save division
+  await prefs.setString('semester', semester); // Save semester
 }
 
 class AdminLogin extends StatefulWidget {
@@ -47,14 +63,22 @@ class _AdminLoginState extends State<AdminLogin> {
       college = prefs.getString('college_name');
     });
 
-    if (collegeName == null || college == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => CollegeSelectionPage()),
-        );
-      });
+    if (college == null || collegeName == null) {
+      showSnackbar(context, "Error: College name not found!", Colors.red);
     }
+  }
+
+  Future<void> saveAdminDetails(Map<String, dynamic> userDetails) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('name', userDetails['name']);
+    await prefs.setString('email', userDetails['email']);
+    await prefs.setString('number', userDetails['number']);
+    await prefs.setString('department', userDetails['department']);
+    await prefs.setString('year', userDetails['year']);
+    await prefs.setString('semester', userDetails['semester']);
+    await prefs.setString('division', userDetails['division']);
   }
 
   Future<void> login(BuildContext context) async {
@@ -74,7 +98,7 @@ class _AdminLoginState extends State<AdminLogin> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.108.47:5000/api/adminLogin');
+      final url = Uri.parse('http://192.168.123.47:5000/api/adminLogin');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -90,17 +114,31 @@ class _AdminLoginState extends State<AdminLogin> {
       });
 
       if (response.statusCode == 200) {
-        final name = jsonDecode(response.body)['name'];
+        final userDetails = jsonDecode(response.body);
 
-        await saveLoginStatus(true, "admin", collegeName!, college!);
+        await saveLoginStatus(
+            true,
+            'admin',
+            collegeName ?? '',
+            college ?? '',
+            userDetails['name'],
+            userDetails['email'],
+            userDetails['number'],
+            userDetails['department'],
+            userDetails['year'],
+            userDetails['division'],
+            userDetails['semester']);
+        await saveAdminDetails(userDetails);
 
-        showSnackbar(context, 'Welcome, $name!', Colors.green);
+        showSnackbar(context, 'Welcome, ${userDetails['name']}!', Colors.green);
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => AdminHomePage(
-                  collegeName: collegeName ?? '', college: college ?? '')),
+                    collegeName: collegeName ?? '',
+                    college: college ?? '',
+                  )),
         );
       } else {
         showSnackbar(
