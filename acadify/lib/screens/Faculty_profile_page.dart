@@ -25,7 +25,8 @@ class FacultyProfilePage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  FacultyProfilePage({required this.collegeName, required this.college});
+  const FacultyProfilePage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _FacultyProfilePageState createState() => _FacultyProfilePageState();

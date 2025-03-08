@@ -33,7 +33,8 @@ class StudentProfilePage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  StudentProfilePage({required this.collegeName, required this.college});
+  const StudentProfilePage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _StudentProfilePageState createState() => _StudentProfilePageState();

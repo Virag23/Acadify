@@ -29,7 +29,8 @@ class FacultyRegistrationPage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  FacultyRegistrationPage({required this.collegeName, required this.college});
+  const FacultyRegistrationPage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _FacultyRegistrationPageState createState() =>
@@ -122,7 +123,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.123.47:5000/api/facultyregister');
+      final url = Uri.parse('http://192.168.38.47:5000/api/facultyregister');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -314,13 +315,13 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
                   ? CircularProgressIndicator() // Show loading indicator if isLoading is true
                   : ElevatedButton(
                       onPressed: () => registerFaculty(context),
-                      child: Text('Register',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                             horizontal: 50, vertical: 20), // Button size
                       ),
+                      child: Text('Register',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400)),
                     ),
             ),
             SizedBox(height: 20),

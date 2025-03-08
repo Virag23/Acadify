@@ -35,7 +35,8 @@ class AdminRegistrationPage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  AdminRegistrationPage({required this.collegeName, required this.college});
+  const AdminRegistrationPage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _AdminRegistrationPageState createState() => _AdminRegistrationPageState();
@@ -130,7 +131,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.123.47:5000/api/adminRegister');
+      final url = Uri.parse('http://192.168.38.47:5000/api/adminRegister');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -369,13 +370,13 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   ? CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: () => registerAdmin(context),
-                      child: Text('Register',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
                       style: ElevatedButton.styleFrom(
                         padding:
                             EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                       ),
+                      child: Text('Register',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400)),
                     ),
             ),
             SizedBox(height: 20),

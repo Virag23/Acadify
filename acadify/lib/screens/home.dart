@@ -34,7 +34,7 @@ class HomePage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  HomePage({required this.collegeName, required this.college});
+  const HomePage({super.key, required this.collegeName, required this.college});
 
   @override
   _StudentHomePageState createState() => _StudentHomePageState();

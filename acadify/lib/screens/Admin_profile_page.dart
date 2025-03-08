@@ -31,7 +31,8 @@ class AdminProfilePage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  AdminProfilePage({required this.collegeName, required this.college});
+  const AdminProfilePage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _AdminProfilePageState createState() => _AdminProfilePageState();

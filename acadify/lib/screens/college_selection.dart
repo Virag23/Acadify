@@ -5,6 +5,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CollegeSelectionPage extends StatefulWidget {
+  const CollegeSelectionPage({super.key});
+
   @override
   _CollegeSelectionPageState createState() => _CollegeSelectionPageState();
 }
@@ -56,9 +58,9 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
   Future<void> fetchColleges() async {
     try {
       final collegeResponse =
-          await http.get(Uri.parse('http://192.168.123.47:5000/api/colleges'));
+          await http.get(Uri.parse('http://192.168.38.47:5000/api/colleges'));
       final nameResponse =
-          await http.get(Uri.parse('http://192.168.123.47:5000/api/names'));
+          await http.get(Uri.parse('http://192.168.38.47:5000/api/names'));
 
       if (collegeResponse.statusCode == 200 && nameResponse.statusCode == 200) {
         final List<dynamic> collegeList = jsonDecode(collegeResponse.body);
@@ -91,7 +93,7 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
 
     setState(() => isLoading = true);
     final response = await http.post(
-      Uri.parse('http://192.168.123.47:5000/api/verify_college'),
+      Uri.parse('http://192.168.38.47:5000/api/verify_college'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         "college_full_name": selectedCollege,

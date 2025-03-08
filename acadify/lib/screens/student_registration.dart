@@ -37,7 +37,8 @@ class StudentRegistrationPage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  StudentRegistrationPage({required this.collegeName, required this.college});
+  const StudentRegistrationPage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _StudentRegistrationPageState createState() =>
@@ -141,7 +142,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.123.47:5000/api/register'),
+        Uri.parse('http://192.168.38.47:5000/api/register'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "college": college, // Send college name dynamically
@@ -406,13 +407,13 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   ? CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: () => registerStudent(context),
-                      child: Text('Register',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
                       style: ElevatedButton.styleFrom(
                         padding:
                             EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                       ),
+                      child: Text('Register',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400)),
                     ),
             ),
             SizedBox(height: 20),

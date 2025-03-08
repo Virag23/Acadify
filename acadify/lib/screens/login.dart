@@ -37,7 +37,8 @@ class LoginPage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  LoginPage({required this.collegeName, required this.college});
+  const LoginPage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -103,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.123.47:5000/api/login'),
+        Uri.parse('http://192.168.38.47:5000/api/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'college': college,
@@ -228,10 +229,10 @@ class _LoginPageState extends State<LoginPage> {
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () => login(context),
-                        child: Text('Login', style: TextStyle(fontSize: 20)),
                         style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 50, vertical: 20)),
+                        child: Text('Login', style: TextStyle(fontSize: 20)),
                       ),
               ),
               SizedBox(height: 20),

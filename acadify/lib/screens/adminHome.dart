@@ -32,7 +32,8 @@ class AdminHomePage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  AdminHomePage({required this.collegeName, required this.college});
+  const AdminHomePage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _AdminHomePage createState() => _AdminHomePage();

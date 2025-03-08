@@ -35,7 +35,8 @@ class AdminLogin extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  AdminLogin({required this.collegeName, required this.college});
+  const AdminLogin(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _AdminLoginState createState() => _AdminLoginState();
@@ -98,7 +99,7 @@ class _AdminLoginState extends State<AdminLogin> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.123.47:5000/api/adminLogin');
+      final url = Uri.parse('http://192.168.38.47:5000/api/adminLogin');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -236,13 +237,13 @@ class _AdminLoginState extends State<AdminLogin> {
                     ? CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () => login(context),
-                        child: Text('Login',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w400)),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(
                               horizontal: 50, vertical: 20),
                         ),
+                        child: Text('Login',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w400)),
                       ),
               ),
               SizedBox(height: 20),

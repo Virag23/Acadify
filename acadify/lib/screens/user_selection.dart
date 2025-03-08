@@ -9,7 +9,8 @@ class UserSelectionPage extends StatefulWidget {
   final String collegeName;
   final String college;
 
-  UserSelectionPage({required this.collegeName, required this.college});
+  const UserSelectionPage(
+      {super.key, required this.collegeName, required this.college});
 
   @override
   _UserSelectionPageState createState() => _UserSelectionPageState();
@@ -168,6 +169,7 @@ class UserBox extends StatelessWidget {
   final VoidCallback onTap;
 
   const UserBox({
+    super.key,
     required this.title,
     required this.icon,
     required this.onTap,
