@@ -1,3 +1,4 @@
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -93,14 +94,8 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: Colors.blue, size: 30),
-        title: Text(
-          title,
-          style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w400,
-              color: const Color.fromARGB(255, 0, 0, 0)),
-        ),
-        subtitle: Text(value, style: TextStyle(fontSize: 16)),
+        title: Text(title, style: TextStyles.headingText),
+        subtitle: Text(value, style: TextStyles.bodyText),
       ),
     );
   }
@@ -111,7 +106,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
       appBar: AppBar(
         title: Text(
           'ACADIFY',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          style: TextStyles.acadifyTitle,
         ),
         centerTitle: true,
       ),
@@ -128,16 +123,14 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
                   child: Text(
                     collegeName ?? 'Loading...',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyles.collegeName,
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 30.0),
                 child: Center(
-                  child: Text('$name Profile',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  child: Text('$name Profile', style: TextStyles.headingText),
                 ),
               ),
               SizedBox(height: 20),
@@ -153,13 +146,9 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
                     SizedBox(height: 10),
                     Text(
                       name,
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style: TextStyles.bodyText,
                     ),
-                    Text(email,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: const Color.fromARGB(255, 8, 11, 12))),
+                    Text(email, style: TextStyles.bodyText),
                   ],
                 ),
               ),
@@ -180,7 +169,6 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
                   ],
                 ),
               ),
-
               SizedBox(height: 30),
             ],
           ),

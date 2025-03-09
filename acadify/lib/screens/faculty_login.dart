@@ -1,4 +1,5 @@
 import 'package:acadify/screens/faculty_registration.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:acadify/screens/faculty_home.dart';
@@ -157,13 +158,7 @@ class _FacultyLoginState extends State<FacultyLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ACADIFY',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('ACADIFY', style: TextStyles.acadifyTitle),
         centerTitle: true,
       ),
       body: Padding(
@@ -181,16 +176,14 @@ class _FacultyLoginState extends State<FacultyLogin> {
                     collegeName ?? 'Loading...',
                     textAlign: TextAlign
                         .center, // Ensures text alignment within the widget
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyles.collegeName,
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 0.0),
                 child: Center(
-                  child: Text('Faculty Login',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  child: Text('Faculty Login', style: TextStyles.headingText),
                 ),
               ),
               SizedBox(height: 15),
@@ -198,14 +191,13 @@ class _FacultyLoginState extends State<FacultyLogin> {
                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
+                  labelStyle: TextStyles.bodyText.copyWith(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: Colors.black),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                  alignLabelWithHint: true,
                 ),
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                style: TextStyles
+                    .bodyText, // Ensures text inside the TextField also uses Roboto
               ),
               SizedBox(height: 15),
               TextField(
@@ -213,14 +205,13 @@ class _FacultyLoginState extends State<FacultyLogin> {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Password',
+                  labelStyle: TextStyles.bodyText.copyWith(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: Colors.black),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                  alignLabelWithHint: true,
                 ),
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                style: TextStyles
+                    .bodyText, // Ensures text inside the TextField also uses Roboto
               ),
               SizedBox(height: 20),
               Center(
@@ -232,9 +223,7 @@ class _FacultyLoginState extends State<FacultyLogin> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 50, vertical: 20),
                         ),
-                        child: Text('Login',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w400)),
+                        child: Text('Login', style: TextStyles.headingText),
                       ),
               ),
               SizedBox(height: 20),
@@ -251,7 +240,7 @@ class _FacultyLoginState extends State<FacultyLogin> {
                   },
                   child: Text(
                     "New faculty? Register here",
-                    style: TextStyle(fontSize: 16, color: Colors.blue),
+                    style: TextStyles.bodyText,
                   ),
                 ),
               ),

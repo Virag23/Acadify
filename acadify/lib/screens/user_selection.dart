@@ -1,9 +1,10 @@
 import 'package:acadify/screens/adminRegistration.dart';
 import 'package:acadify/screens/faculty_registration.dart';
 import 'package:acadify/screens/student_registration.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'college_selection.dart'; // Import the CollegeSelectionPage
+import 'college_selection.dart';
 
 class UserSelectionPage extends StatefulWidget {
   final String collegeName;
@@ -72,13 +73,7 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ACADIFY',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('ACADIFY', style: TextStyles.acadifyTitle),
         centerTitle: true,
         actions: [
           IconButton(
@@ -95,19 +90,17 @@ class _UserSelectionPageState extends State<UserSelectionPage> {
             padding: const EdgeInsets.only(top: 0.0),
             child: Align(
               alignment: Alignment.center,
-              child: Text(
-                collegeName ?? 'Loading...',
-                textAlign: TextAlign
-                    .center, // Ensures text alignment within the widget
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              child: Text(collegeName ?? 'Loading...',
+                  textAlign: TextAlign
+                      .center, // Ensures text alignment within the widget
+                  style: TextStyles.collegeName),
             ),
           ),
           SizedBox(height: 20),
           Center(
             child: Text(
               'User Selection',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              style: TextStyles.headingText,
             ),
           ),
           Expanded(
@@ -193,7 +186,7 @@ class UserBox extends StatelessWidget {
             SizedBox(width: 20),
             Text(
               title,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyles.bodyText,
             ),
           ],
         ),

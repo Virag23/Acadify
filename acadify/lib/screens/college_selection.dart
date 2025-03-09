@@ -1,3 +1,4 @@
+import 'package:acadify/theme/text_styles.dart';
 import 'package:acadify/screens/user_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -126,7 +127,7 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
       appBar: AppBar(
         title: const Text(
           'ACADIFY',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          style: TextStyles.acadifyTitle,
         ),
         centerTitle: true,
       ),
@@ -139,7 +140,7 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
               padding: EdgeInsets.only(bottom: 20.0),
               child: Text(
                 'Select Institute',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                style: TextStyles.headingText,
               ),
             ),
             DropdownButton<String>(
@@ -147,13 +148,20 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
               value: selectedCollege,
               isExpanded: true,
               items: colleges.map((college) {
-                return DropdownMenuItem(value: college, child: Text(college));
+                return DropdownMenuItem(
+                  value: college,
+                  child: Text(
+                    college,
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                );
               }).toList(),
               onChanged: (value) {
                 setState(() {
                   selectedCollege = value; // Sync college name
                 });
               },
+              style: TextStyles.bodyText,
             ),
             const SizedBox(height: 15),
             DropdownButton<String>(
@@ -161,25 +169,34 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
               value: selectedName,
               isExpanded: true,
               items: names.map((name) {
-                return DropdownMenuItem(value: name, child: Text(name));
+                return DropdownMenuItem(
+                  value: name,
+                  child: Text(
+                    name,
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                );
               }).toList(),
               onChanged: (value) {
                 setState(() {
                   selectedName = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 15),
             TextField(
               controller: passwordController,
               obscureText: true,
               decoration: InputDecoration(
-                labelText: 'Enter College Password',
+                labelText: 'Enter Institute Password',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               ),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             const SizedBox(height: 25),
             Center(
@@ -191,9 +208,8 @@ class _CollegeSelectionPageState extends State<CollegeSelectionPage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 50, vertical: 15),
                       ),
-                      child: const Text("Verify",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      child:
+                          const Text("Verify", style: TextStyles.headingText),
                     ),
             ),
           ],

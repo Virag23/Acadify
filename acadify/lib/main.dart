@@ -24,7 +24,7 @@ void main() {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, required String initialRoute}) : super(key: key);
+  const MyApp({super.key, required String initialRoute});
 
   @override
   State<MyApp> createState() => _MyAppState();

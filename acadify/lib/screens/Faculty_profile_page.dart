@@ -1,3 +1,4 @@
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,14 +69,7 @@ class _FacultyProfilePageState extends State<FacultyProfilePage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: Colors.blue, size: 30),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
+        title: Text(title, style: TextStyles.headingText),
         subtitle: Text(value, style: TextStyle(fontSize: 16)),
       ),
     );
@@ -87,7 +81,7 @@ class _FacultyProfilePageState extends State<FacultyProfilePage> {
       appBar: AppBar(
         title: Text(
           'ACADIFY',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          style: TextStyles.acadifyTitle,
         ),
         centerTitle: true,
       ),
@@ -104,21 +98,17 @@ class _FacultyProfilePageState extends State<FacultyProfilePage> {
                   child: Text(
                     collegeName ?? 'Loading...',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    style: TextStyles.collegeName,
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 30.0),
                 child: Center(
-                  child: Text('$name Profile',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  child: Text('$name Profile', style: TextStyles.headingText),
                 ),
               ),
               SizedBox(height: 20),
-
-              // Profile Section
               Center(
                 child: Column(
                   children: [
@@ -138,7 +128,6 @@ class _FacultyProfilePageState extends State<FacultyProfilePage> {
                   ],
                 ),
               ),
-
               SizedBox(height: 20),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),

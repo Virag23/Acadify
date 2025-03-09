@@ -1,5 +1,6 @@
 import 'package:acadify/screens/adminHome.dart';
 import 'package:acadify/screens/adminLogin.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -211,13 +212,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ACADIFY',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('ACADIFY', style: TextStyles.acadifyTitle),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -234,60 +229,55 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   collegeName ?? 'Loading...',
                   textAlign: TextAlign
                       .center, // Ensures text alignment within the widget
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyles.collegeName,
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 0.0),
               child: Center(
-                child: Text('Admin Registration',
-                    style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                child:
+                    Text('Admin Registration', style: TextStyles.headingText),
               ),
             ),
             SizedBox(height: 15),
             TextField(
-              controller: nameController,
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Full Name',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             SizedBox(height: 15),
             TextField(
               controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             SizedBox(height: 15),
             TextField(
-              controller: numberController,
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Phone Number',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             DropdownButtonFormField<String>(
               value: selectedDepartment,
@@ -295,7 +285,10 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
               items: departments.map((department) {
                 return DropdownMenuItem<String>(
                   value: department,
-                  child: Text(department),
+                  child: Text(
+                    department,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -303,6 +296,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   selectedDepartment = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             DropdownButtonFormField<String>(
               value: selectedYear,
@@ -310,7 +304,10 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
               items: years.map((year) {
                 return DropdownMenuItem<String>(
                   value: year,
-                  child: Text(year),
+                  child: Text(
+                    year,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -318,6 +315,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   selectedYear = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             DropdownButtonFormField<String>(
               value: selectedSemester,
@@ -325,7 +323,10 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
               items: semesters.map((sem) {
                 return DropdownMenuItem<String>(
                   value: sem,
-                  child: Text(sem),
+                  child: Text(
+                    sem,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -333,6 +334,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   selectedSemester = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             DropdownButtonFormField<String>(
               value: selectedDivision,
@@ -340,7 +342,10 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
               items: divisions.map((div) {
                 return DropdownMenuItem<String>(
                   value: div,
-                  child: Text(div),
+                  child: Text(
+                    div,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -348,21 +353,20 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                   selectedDivision = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 15),
             TextField(
-              controller: passwordController,
-              obscureText: true,
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Password',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             SizedBox(height: 20),
             Center(
@@ -374,9 +378,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                       ),
-                      child: Text('Register',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
+                      child: Text('Register', style: TextStyles.headingText),
                     ),
             ),
             SizedBox(height: 20),
@@ -392,7 +394,7 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
                 },
                 child: Text(
                   "Already have an account? Login here",
-                  style: TextStyle(fontSize: 16, color: Colors.blue),
+                  style: TextStyles.bodyText,
                 ),
               ),
             ),
@@ -423,12 +425,20 @@ class _AdminRegistrationPageState extends State<AdminRegistrationPage> {
       padding: const EdgeInsets.only(bottom: 20),
       child: DropdownButtonFormField<String>(
         value: selectedValue,
-        decoration:
-            InputDecoration(labelText: label, border: OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyles.bodyText, // Apply Roboto for label
+          border: OutlineInputBorder(),
+        ),
         items: items.map((value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value,
+                style: TextStyles.bodyText), // Apply Roboto for items
+          );
         }).toList(),
         onChanged: onChanged,
+        style: TextStyles.bodyText, // Ensures selected item text uses Roboto
       ),
     );
   }

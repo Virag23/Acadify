@@ -1,5 +1,6 @@
 import 'package:acadify/screens/home.dart';
 import 'package:acadify/screens/login.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // For JSON encoding
 import 'package:http/http.dart' as http; // HTTP requests
@@ -224,8 +225,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ACADIFY',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+        title: Text('ACADIFY', style: TextStyles.acadifyTitle),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -242,16 +242,15 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   collegeName ?? 'Loading...',
                   textAlign: TextAlign
                       .center, // Ensures text alignment within the widget
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyles.collegeName,
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 0.0),
               child: Center(
-                child: Text('Student Registration',
-                    style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                child:
+                    Text('Student Registration', style: TextStyles.headingText),
               ),
             ),
             SizedBox(height: 15),
@@ -266,7 +265,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 50),
                 alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 15),
             TextField(
@@ -280,7 +279,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 50),
                 alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 15),
             TextField(
@@ -294,7 +293,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 50),
                 alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 15),
             TextField(
@@ -308,7 +307,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 50),
                 alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles.bodyText,
             ),
             DropdownButtonFormField<String>(
               value: selectedDepartment,
@@ -316,7 +315,10 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
               items: departments.map((dept) {
                 return DropdownMenuItem<String>(
                   value: dept,
-                  child: Text(dept),
+                  child: Text(
+                    dept,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -324,6 +326,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   selectedDepartment = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             DropdownButtonFormField<String>(
               value: selectedYear,
@@ -331,7 +334,10 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
               items: years.map((year) {
                 return DropdownMenuItem<String>(
                   value: year,
-                  child: Text(year),
+                  child: Text(
+                    year,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -339,6 +345,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   selectedYear = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             DropdownButtonFormField<String>(
               value: selectedSemester,
@@ -346,7 +353,10 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
               items: semesters.map((sem) {
                 return DropdownMenuItem<String>(
                   value: sem,
-                  child: Text(sem),
+                  child: Text(
+                    sem,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -354,6 +364,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   selectedSemester = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             DropdownButtonFormField<String>(
               value: selectedDivision,
@@ -361,7 +372,10 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
               items: divisions.map((div) {
                 return DropdownMenuItem<String>(
                   value: div,
-                  child: Text(div),
+                  child: Text(
+                    div,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -369,6 +383,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                   selectedDivision = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 15),
             TextField(
@@ -382,7 +397,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 50),
                 alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 15),
             TextField(
@@ -399,7 +414,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                 ),
                 alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 20),
             Center(
@@ -411,9 +426,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                       ),
-                      child: Text('Register',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
+                      child: Text('Register', style: TextStyles.headingText),
                     ),
             ),
             SizedBox(height: 20),
@@ -429,7 +442,7 @@ class _StudentRegistrationPageState extends State<StudentRegistrationPage> {
                               )));
                 },
                 child: Text("Already a registered student? Log in here.",
-                    style: TextStyle(fontSize: 16, color: Colors.blue)),
+                    style: TextStyles.bodyText),
               ),
             ),
           ],

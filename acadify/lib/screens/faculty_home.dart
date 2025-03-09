@@ -1,14 +1,26 @@
 import 'package:acadify/screens/Faculty_profile_page.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> saveLoginStatus(
-    bool status, String role, String collegeName, String college) async {
+    bool status,
+    String role,
+    String collegeName,
+    String college,
+    String name,
+    String email,
+    String number,
+    String department) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('isLoggedIn', status);
-  await prefs.setString('userRole', role);
-  await prefs.setString('college_full_name', collegeName);
-  await prefs.setString('college_name', college);
+  await prefs.setBool('isLoggedIn', status); // Save login status
+  await prefs.setString('userRole', role); // Save user role
+  await prefs.setString('college_full_name', collegeName); // Save college name
+  await prefs.setString('college_name', college); // Save college
+  await prefs.setString('name', name); // Save name
+  await prefs.setString('email', email); // Save email
+  await prefs.setString('number', number);
+  await prefs.setString('department', department);
 }
 
 class FacultyHomePage extends StatefulWidget {
@@ -32,7 +44,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
   void initState() {
     super.initState();
     _loadCollegeName();
-    _loadFacultyDetails();
+    _loadStudentDetails();
   }
 
   Future<void> _loadCollegeName() async {
@@ -43,7 +55,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
     });
   }
 
-  Future<void> _loadFacultyDetails() async {
+  Future<void> _loadStudentDetails() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     setState(() {
@@ -56,8 +68,9 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
     });
   }
 
+  // Prevent Back Navigation
   Future<bool> _onWillPop() async {
-    return false; // Disable back button
+    return false;
   }
 
   @override
@@ -68,7 +81,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
         appBar: AppBar(
           title: Text(
             'ACADIFY',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            style: TextStyles.acadifyTitle,
           ),
           centerTitle: true,
           actions: [
@@ -93,8 +106,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                     child: Text(
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyles.collegeName,
                     ),
                   ),
                 ),
@@ -103,21 +115,23 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
-                      // Profile Icon
                       CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.blue.shade100,
-                        child: Icon(Icons.person, size: 35, color: Colors.blue),
+                        radius: 70,
+                        backgroundColor:
+                            const Color.fromARGB(255, 109, 255, 118),
+                        child: CircleAvatar(
+                          radius: 65,
+                          backgroundColor: Colors.blue,
+                          child: const Icon(Icons.person,
+                              size: 70, color: Colors.white),
+                        ),
                       ),
-                      SizedBox(width: 15), SizedBox(width: 15),
+                      SizedBox(width: 10),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Welcome, $name',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
+                          Text('Welcome, $name', style: TextStyles.headText),
+                          Text('$department', style: TextStyles.defText),
                         ],
                       ),
                     ],
@@ -135,9 +149,13 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
                     children: [
                       featureCard(Icons.person, "Profile"),
                       featureCard(Icons.assignment, "Assignments"),
-                      featureCard(Icons.book, "E-Library"),
+                      featureCard(Icons.book, "Notes"),
                       featureCard(Icons.school, "Attendance"),
-                      featureCard(Icons.calendar_today, "Events"),
+                      featureCard(Icons.calendar_today, "Academic Calenar"),
+                      featureCard(Icons.access_time, "Timetable"),
+                      featureCard(Icons.event_note, "Exam Schedule"),
+                      featureCard(Icons.score, "Results"),
+                      featureCard(Icons.groups, "Alumni Network"),
                     ],
                   ),
                 ),
@@ -149,6 +167,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
     );
   }
 
+  // Feature Card Widget
   Widget featureCard(IconData icon, String title) {
     return Card(
       elevation: 4,
@@ -175,7 +194,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.blue.withOpacity(0.1), // Circular background
+                color: Colors.blue.withOpacity(0.1),
               ),
               child: Icon(icon, size: 30, color: Colors.blue),
             ),
@@ -183,7 +202,7 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyles.defText,
             ),
           ],
         ),
@@ -191,9 +210,10 @@ class _FacultyHomePageState extends State<FacultyHomePage> {
     );
   }
 
+  // Logout Function
   Future<void> _logout(BuildContext context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear all stored data
+    await prefs.clear();
     Navigator.pushReplacementNamed(context, '/collegeSelection');
   }
 }

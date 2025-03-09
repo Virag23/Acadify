@@ -1,4 +1,5 @@
 import 'package:acadify/screens/Admin_profile_page.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -109,7 +110,7 @@ class _AdminHomePage extends State<AdminHomePage> {
         appBar: AppBar(
           title: Text(
             'ACADIFY',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            style: TextStyles.acadifyTitle,
           ),
           centerTitle: true,
           actions: [
@@ -134,30 +135,33 @@ class _AdminHomePage extends State<AdminHomePage> {
                     child: Text(
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyles.collegeName,
                     ),
                   ),
                 ),
                 SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
                       CircleAvatar(
-                        radius: 35,
-                        backgroundColor: Colors.blue.shade100,
-                        child: Icon(Icons.person, size: 35, color: Colors.blue),
+                        radius: 70,
+                        backgroundColor:
+                            const Color.fromARGB(255, 109, 255, 118),
+                        child: CircleAvatar(
+                          radius: 65,
+                          backgroundColor: Colors.blue,
+                          child: const Icon(Icons.person,
+                              size: 70, color: Colors.white),
+                        ),
                       ),
-                      SizedBox(width: 15),
+                      SizedBox(width: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Welcome, $name',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
+                          Text('Welcome, $name', style: TextStyles.headText),
+                          Text('$year - $department [$division]',
+                              style: TextStyles.defText),
                         ],
                       ),
                     ],
@@ -174,15 +178,15 @@ class _AdminHomePage extends State<AdminHomePage> {
                     mainAxisSpacing: 15,
                     children: [
                       featureCard(Icons.person, "Profile"),
-                      featureCard(Icons.schedule, "Timetable"),
-                      featureCard(Icons.event, "Academic Calendar"),
-                      featureCard(Icons.access_time, "Exam Schedule"),
+                      featureCard(Icons.assignment, "Assignments"),
+                      featureCard(Icons.book, "Notes"),
                       featureCard(Icons.school, "Attendance"),
-                      featureCard(Icons.update, "Manage Student"),
-                      featureCard(Icons.description, "Previous Year Paper"),
-                      featureCard(Icons.notifications, "Updates"),
-                      featureCard(Icons.assignment_turned_in, "Semester End"),
-                      featureCard(Icons.calendar_today, "Year End"),
+                      featureCard(Icons.calendar_today, "Academic Calendar"),
+                      featureCard(Icons.access_time, "Timetable"),
+                      featureCard(Icons.event_note, "Exam Schedule"),
+                      featureCard(Icons.score, "Results"),
+                      featureCard(Icons.people, "Faculty Connect"),
+                      featureCard(Icons.groups, "Alumni Network"),
                     ],
                   ),
                 ),
@@ -194,10 +198,11 @@ class _AdminHomePage extends State<AdminHomePage> {
     );
   }
 
+  // Feature Card Widget
   Widget featureCard(IconData icon, String title) {
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
           if (title == "Profile") {
@@ -228,7 +233,7 @@ class _AdminHomePage extends State<AdminHomePage> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyles.defText,
             ),
           ],
         ),
@@ -236,6 +241,7 @@ class _AdminHomePage extends State<AdminHomePage> {
     );
   }
 
+  // Logout Function
   Future<void> _logout(BuildContext context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();

@@ -1,5 +1,6 @@
 import 'package:acadify/screens/faculty_home.dart';
 import 'package:acadify/screens/faculty_login.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // For JSON encoding
 import 'package:http/http.dart' as http; // HTTP requests
@@ -202,13 +203,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ACADIFY',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('ACADIFY', style: TextStyles.acadifyTitle),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -225,59 +220,55 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
                   collegeName ?? 'Loading...',
                   textAlign: TextAlign
                       .center, // Ensures text alignment within the widget
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyles.collegeName,
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 0.0),
               child: Center(
-                child: Text('Faculty Registration',
-                    style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                child:
+                    Text('Faculty Registration', style: TextStyles.headingText),
               ),
             ),
             SizedBox(height: 15),
             TextField(
-              controller: nameController,
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Full Name',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             SizedBox(height: 15),
             TextField(
               controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Email',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             SizedBox(height: 15),
             TextField(
-              controller: numberController,
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Phone Number',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             DropdownButtonFormField<String>(
               value: selectedDepartment,
@@ -285,7 +276,10 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
               items: departments.map((dept) {
                 return DropdownMenuItem<String>(
                   value: dept,
-                  child: Text(dept),
+                  child: Text(
+                    dept,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
               onChanged: (value) {
@@ -293,21 +287,20 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
                   selectedDepartment = value;
                 });
               },
+              style: TextStyles.bodyText,
             ),
             SizedBox(height: 15),
             TextField(
-              controller: passwordController,
-              obscureText: true,
+              controller: emailController,
               decoration: InputDecoration(
                 labelText: 'Password',
+                labelStyle: TextStyles.bodyText.copyWith(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: Colors.black),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 50),
-                alignLabelWithHint: true,
               ),
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+              style: TextStyles
+                  .bodyText, // Ensures text inside the TextField also uses Roboto
             ),
             SizedBox(height: 20),
             Center(
@@ -319,9 +312,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 50, vertical: 20), // Button size
                       ),
-                      child: Text('Register',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w400)),
+                      child: Text('Register', style: TextStyles.headingText),
                     ),
             ),
             SizedBox(height: 20),
@@ -336,7 +327,7 @@ class _FacultyRegistrationPageState extends State<FacultyRegistrationPage> {
                 },
                 child: Text(
                   "Already a registered faculty? Log in here.",
-                  style: TextStyle(fontSize: 16, color: Colors.blue),
+                  style: TextStyles.bodyText,
                 ),
               ),
             ),

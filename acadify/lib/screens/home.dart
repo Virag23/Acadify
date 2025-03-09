@@ -1,4 +1,5 @@
 import 'package:acadify/screens/Student_profile_page.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,6 +11,7 @@ Future<void> saveLoginStatus(
     String name,
     String email,
     String number,
+    String prn,
     String department,
     String year,
     String division,
@@ -23,6 +25,7 @@ Future<void> saveLoginStatus(
   await prefs.setString('name', name); // Save name
   await prefs.setString('email', email); // Save email
   await prefs.setString('number', number); // Save phone number
+  await prefs.setString('prn', prn);
   await prefs.setString('department', department); // Save department
   await prefs.setString('year', year); // Save year
   await prefs.setString('division', division); // Save division
@@ -100,7 +103,7 @@ class _StudentHomePageState extends State<HomePage> {
         appBar: AppBar(
           title: Text(
             'ACADIFY',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            style: TextStyles.acadifyTitle,
           ),
           centerTitle: true,
           actions: [
@@ -125,8 +128,7 @@ class _StudentHomePageState extends State<HomePage> {
                     child: Text(
                       collegeName ?? 'Loading...',
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyles.collegeName,
                     ),
                   ),
                 ),
@@ -135,22 +137,46 @@ class _StudentHomePageState extends State<HomePage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
-                      // Profile Icon
                       CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.blue.shade100,
-                        child: Icon(Icons.person, size: 35, color: Colors.blue),
+                        radius: 70,
+                        backgroundColor:
+                            const Color.fromARGB(255, 109, 255, 118),
+                        child: CircleAvatar(
+                          radius: 65,
+                          backgroundColor: Colors.blue,
+                          child: const Icon(Icons.person,
+                              size: 70, color: Colors.white),
+                        ),
                       ),
-                      SizedBox(width: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Welcome, $name',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                      SizedBox(width: 10),
+                      Expanded(
+                        // Prevents overflow by adjusting to available space
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome,',
+                              style: TextStyles.headText,
+                              overflow: TextOverflow
+                                  .ellipsis, // Ensures long text truncates
+                              maxLines: 1,
+                            ),
+                            Text(
+                              '$name',
+                              style: TextStyles.headText,
+                              overflow: TextOverflow
+                                  .ellipsis, // Ensures long text truncates
+                              maxLines: 1,
+                            ),
+                            Text(
+                              '$year - $department [$division]',
+                              style: TextStyles.defText,
+                              overflow: TextOverflow
+                                  .ellipsis, // Prevents overflow for this line too
+                              maxLines: 1,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -167,15 +193,14 @@ class _StudentHomePageState extends State<HomePage> {
                     children: [
                       featureCard(Icons.person, "Profile"),
                       featureCard(Icons.assignment, "Assignments"),
-                      featureCard(Icons.book, "E-Library"),
+                      featureCard(Icons.book, "Notes"),
                       featureCard(Icons.school, "Attendance"),
-                      featureCard(Icons.calendar_today, "Events"),
+                      featureCard(Icons.calendar_today, "Academic Calendar"),
                       featureCard(Icons.access_time, "Timetable"),
                       featureCard(Icons.event_note, "Exam Schedule"),
                       featureCard(Icons.score, "Results"),
                       featureCard(Icons.people, "Faculty Connect"),
                       featureCard(Icons.groups, "Alumni Network"),
-                      featureCard(Icons.notifications, "General Updates"),
                     ],
                   ),
                 ),
@@ -222,7 +247,7 @@ class _StudentHomePageState extends State<HomePage> {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyles.defText,
             ),
           ],
         ),

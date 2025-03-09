@@ -1,4 +1,5 @@
 import 'package:acadify/screens/adminRegistration.dart';
+import 'package:acadify/theme/text_styles.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -169,7 +170,7 @@ class _AdminLoginState extends State<AdminLogin> {
       appBar: AppBar(
         title: Text(
           'ACADIFY',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          style: TextStyles.acadifyTitle,
         ),
         centerTitle: true,
       ),
@@ -188,16 +189,14 @@ class _AdminLoginState extends State<AdminLogin> {
                     collegeName ?? 'Loading...',
                     textAlign: TextAlign
                         .center, // Ensures text alignment within the widget
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyles.collegeName,
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 0.0),
                 child: Center(
-                  child: Text('Admin Login',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w600)),
+                  child: Text('Admin Login', style: TextStyles.headingText),
                 ),
               ),
               SizedBox(height: 15),
@@ -205,15 +204,13 @@ class _AdminLoginState extends State<AdminLogin> {
                 controller: emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
+                  labelStyle: TextStyles.bodyText.copyWith(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: Colors.black),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                  alignLabelWithHint: true,
                 ),
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                style: TextStyles
+                    .bodyText, // Ensures text inside the TextField also uses Roboto
               ),
               SizedBox(height: 15),
               TextField(
@@ -221,15 +218,13 @@ class _AdminLoginState extends State<AdminLogin> {
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: 'Password',
+                  labelStyle: TextStyles.bodyText.copyWith(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: Colors.black),
                   ),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                  alignLabelWithHint: true,
                 ),
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                style: TextStyles
+                    .bodyText, // Ensures text inside the TextField also uses Roboto
               ),
               SizedBox(height: 20),
               Center(
@@ -241,9 +236,7 @@ class _AdminLoginState extends State<AdminLogin> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 50, vertical: 20),
                         ),
-                        child: Text('Login',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w400)),
+                        child: Text('Login', style: TextStyles.headingText),
                       ),
               ),
               SizedBox(height: 20),
@@ -259,7 +252,7 @@ class _AdminLoginState extends State<AdminLogin> {
                   },
                   child: Text(
                     "New Admin? Register here",
-                    style: TextStyle(fontSize: 16, color: Colors.blue),
+                    style: TextStyles.bodyText,
                   ),
                 ),
               ),

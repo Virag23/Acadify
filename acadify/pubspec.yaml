@@ -53,6 +53,20 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+fonts:
+  - family: Gonzaga
+    fonts:
+      - asset: assets/fonts/Gonzaga-Black.ttf
+  - family: SansSerif
+    fonts:
+      - asset: assets/fonts/SansSerif-Bold.ttf
+  - family: Roboto
+    fonts:
+      - asset: assets/fonts/Roboto-Regular.ttf
+  - family: PTSerif
+    fonts:
+      - asset: assets/fonts/PTSerif-Regular.ttf
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
